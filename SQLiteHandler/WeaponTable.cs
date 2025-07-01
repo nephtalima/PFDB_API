@@ -5,11 +5,7 @@ using System.Data;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using PFDB.Logging;
-using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Text;
-using System.Runtime.CompilerServices;
-using System.Xml.Schema;
 
 
 namespace PFDB.SQLite
@@ -23,12 +19,11 @@ namespace PFDB.SQLite
 		private static string _databasePath = "weapon_database.db";
 
 
-		private static string[] _categories = ["weaponName", "category", "categoryNumber", "categoryShorthand", "versionRankTieBreaker", "rank", "uniqueWeaponID"];
+		private static string[] _categories = ["weaponName", "category", "categoryNumber", "categoryShorthand", "versionRankTieBreaker", "rank", "uniqueWeaponID", "weaponNumberInVersion"];
 		private enum _categoryNames
 		{
-			WeaponName, Category, CategoryNumber, CategoryShorthand, VersionRankTieBreaker, Rank, UniqueWeaponID
+			WeaponName, Category, CategoryNumber, CategoryShorthand, VersionRankTieBreaker, Rank, UniqueWeaponID, WeaponNumberInVersion
 		}
-		private static string _tableName = "cumulativeChanges";
 
 
 		//unpopulated fields
@@ -37,16 +32,16 @@ namespace PFDB.SQLite
 			= new Dictionary<PhantomForcesVersion, HashSet<WeaponIdentification>>();
 		private static IDictionary<PhantomForcesVersion, Dictionary<Categories, int>> _weaponCountsCache = new Dictionary<PhantomForcesVersion, Dictionary<Categories, int>>();
 		private static IEnumerable<PhantomForcesVersion> _listOfVersions = new List<PhantomForcesVersion>();
+		private static IDictionary<PhantomForcesVersion, HashSet<(WeaponIdentification weaponID, int weaponNumber)>> _weaponIDAndCategoryWeaponNumbers = new Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification weaponID, int weaponNumber)>>();
 
 		/// <summary>
 		/// Defines a dictionary that maps a Phantom Forces version with a collection of weapon IDs for the particular version (also includes category and weapon numbers).
 		/// </summary>
-		public static Dictionary<PhantomForcesVersion,HashSet<WeaponIdentification>>
-		WeaponIDCache
+		public static Dictionary<PhantomForcesVersion, HashSet<WeaponIdentification>> WeaponIDCache
 		{
 			get
 			{
-				return (Dictionary<PhantomForcesVersion,HashSet<WeaponIdentification>>)_weaponIDCache;
+				return (Dictionary<PhantomForcesVersion, HashSet<WeaponIdentification>>)_weaponIDCache;
 			}
 		}
 
@@ -54,17 +49,47 @@ namespace PFDB.SQLite
 		/// <summary>
 		/// Defines a dictionary that maps a Phantom Forces version to a dictionary that maps each category (in the specified version) to the number of weapons in the specified category.
 		/// </summary>
-		public static Dictionary<
-						PhantomForcesVersion,
-						Dictionary<Categories, int>>
-			WeaponCounts
+		public static Dictionary<PhantomForcesVersion,Dictionary<Categories, int>> WeaponCounts
 		{
 			get
 			{
-				return (Dictionary<
-						PhantomForcesVersion,
-						Dictionary<Categories, int>>)_weaponCountsCache;
+				return (Dictionary<PhantomForcesVersion,Dictionary<Categories, int>>)_weaponCountsCache;
 			}
+		}
+
+		/// <summary>
+		/// Defines a dictionary that maps a Phantom Forces version to a hash set that links a weapon ID to the associated category-weapon number. (i.e. the weapon number obtained when organizing by category, which is the numbers obtained from screenshotting using PFDB_SS)
+		/// </summary>
+		public static Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification weaponID, int weaponNumber)>> WeaponIDAndCategoryWeaponNumbers
+		{
+			get
+			{
+				return (Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification weaponID, int weaponNumber)>>)_weaponIDAndCategoryWeaponNumbers;
+			}
+		}
+
+		private static void _assignWeaponNumbers()
+		{
+			Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification, int)>> weaponNumberPairs = new Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification, int)>>();
+			Stopwatch stopwatch = Stopwatch.StartNew();
+			foreach (PhantomForcesVersion currentVersion in _weaponIDCache.Keys)
+			{
+				HashSet<(WeaponIdentification, int)> temp = new HashSet<(WeaponIdentification, int)>();
+				foreach (Categories category in Enum.GetValues(typeof(Categories)))
+				{
+					int start = 0;
+					foreach (WeaponIdentification id in _weaponIDCache[currentVersion].Where(x => x.Category == category))
+					{
+						temp.Add((id, start));
+						PFDBLogger.LogDebug($"{currentVersion.VersionString}, {category}, {id.WeaponName}, {start}");
+						start++;
+					}
+				}
+				weaponNumberPairs.Add(currentVersion, temp);
+			}
+			stopwatch.Stop();
+			PFDBLogger.LogStopwatch(stopwatch, "Weapon category-weapon number assigment duration:");
+			_weaponIDAndCategoryWeaponNumbers = weaponNumberPairs;
 		}
 
 
@@ -97,6 +122,12 @@ namespace PFDB.SQLite
 				_getWeaponCountsForEveryVersion();
 				PFDBLogger.LogInformation("Finished weapon counts caching");
 				PFDBLogger.LogDebug("_weaponCountsCache populated");
+
+				PFDBLogger.LogInformation("Starting assignment of category-weapon numbers");
+				_assignWeaponNumbers();
+				PFDBLogger.LogInformation("Finished assignment of category-weapon numbers");
+				PFDBLogger.LogDebug("_weaponIDAndCategoryWeaponNumbers populated");
+
 				success = true;
 			}
 			catch (SQLiteException exception)
@@ -107,9 +138,12 @@ namespace PFDB.SQLite
 			{
 				PFDBLogger.LogError("An error occured while interfacing with the SQLite database.", exception.Message);
 			}
-			stopwatch.Stop();
-
-			PFDBLogger.LogInformation($"Stopwatch elapsed milliseconds: {stopwatch.ElapsedMilliseconds}", parameter: stopwatch);
+			finally
+			{
+				stopwatch.Stop();
+			}
+			PFDBLogger.LogStopwatch(stopwatch, "Total SQLite initialization duration");
+			//PFDBLogger.LogInformation($"Stopwatch elapsed milliseconds: {stopwatch.ElapsedMilliseconds}", parameter: stopwatch);
 			return (success, stopwatch);
 		}
 
@@ -119,7 +153,7 @@ namespace PFDB.SQLite
 		/// </summary>
 		/// <param name="directory">Optional. Assigned to null by default, meaning that it will look for the database in the current directory.</param>
 		/// <returns>A connection stringbuilder from where the connection string can be obtained.</returns>
-		public static SQLiteConnectionStringBuilder _getConnectionString(string? directory = null)
+		private static SQLiteConnectionStringBuilder _getConnectionString(string? directory = null)
 		{
 			string actualpath = directory ?? Directory.GetCurrentDirectory();
 			char slash = Directory.Exists("/usr/bin") ? '/' : '\\';
@@ -248,7 +282,7 @@ namespace PFDB.SQLite
 							$"COUNT(DISTINCT \"{_categories[(int)_categoryNames.WeaponName]}\") \n" +
 							$"FROM \"version{version.VersionNumber}cumulative\" " +
 							$"GROUP BY \"{_categories[(int)_categoryNames.CategoryNumber]}\"" +
-							$"ORDER BY \"{_categories[(int)_categoryNames.CategoryNumber]}\" + 0;";
+							$"ORDER BY \"{_categories[(int)_categoryNames.UniqueWeaponID]}\" + 0;";
 						using (SQLiteDataReader reader = cmd.ExecuteReader())
 						{
 							IDictionary<Categories, int> tempDictionary = new Dictionary<Categories, int>();
@@ -298,7 +332,7 @@ namespace PFDB.SQLite
 								$"COUNT(DISTINCT \"{_categories[(int)_categoryNames.WeaponName]}\") \n" +
 								$"FROM \"version{version.VersionNumber}cumulative\" " +
 								$"GROUP BY \"{_categories[(int)_categoryNames.CategoryNumber]}\"" +
-								$"ORDER BY \"{_categories[(int)_categoryNames.CategoryNumber]}\" + 0;";
+								$"ORDER BY \"{_categories[(int)_categoryNames.UniqueWeaponID]}\" + 0;";
 							using (SQLiteDataReader reader = cmd.ExecuteReader())
 							{
 								IDictionary<Categories, int> tempDictionary = new Dictionary<Categories, int>();
@@ -395,45 +429,16 @@ namespace PFDB.SQLite
 			List<PhantomForcesVersion> listOfVersions = _listOfVersions.ToList();
 			listOfVersions.Sort();
 			PhantomForcesVersion maximumVersion = targetVersion ?? listOfVersions.Last();
-			PFDBLogger.LogInformation(maximumVersion.VersionNumber.ToString());
+			PFDBLogger.LogInformation($"Maximum version: {maximumVersion.VersionNumber}");
 
-			foreach (int limitVersion in versionInts.Where(x => x <= maximumVersion.VersionNumber && x > 800))
-			{
-				foreach (int currentVersion in versionInts.Where(x => x <= limitVersion))
-				{
-					deletionCommandText.Append(
-						$"DELETE FROM version{currentVersion}cumulative\n" +
-						$"WHERE version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} \n" +
-						$"IN (\n" +
-							$"\tSELECT version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} \n" +
-							$"\tFROM version{currentVersion}cumulative \n" +
-							$"\tINNER JOIN version{currentVersion} \n" +
-							$"\tON (version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} = version{currentVersion}.{_categories[(int)_categoryNames.WeaponName]}) \n" +
-							$"\tWHERE version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} IS NOT NULL AND version{currentVersion}.{_categories[(int)_categoryNames.WeaponName]} IS NOT NULL \n" +
-						$");" +
-						$"INSERT INTO version{currentVersion}cumulative (\n" +
-							$"\t\"{_categories[(int)_categoryNames.WeaponName]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.Category]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.CategoryNumber]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.CategoryShorthand]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n" +
-						$") SELECT \n" +
-							$"\t\"{_categories[(int)_categoryNames.WeaponName]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.Category]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.CategoryNumber]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.CategoryShorthand]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\",\n" +
-							$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n" +
-						$"FROM version{currentVersion};\n"
-					);
-				}
-			}
 
-			foreach (int currentVersion in versionInts.Where(x => x <= maximumVersion.VersionNumber && x >= 800))
+			int firstVersion = 800;
+			int previousVersion = firstVersion;
+			foreach (int currentVersion in versionInts.Where(x => x <= maximumVersion.VersionNumber && x >= firstVersion))
 			{
+
 				cleanText.Append(
-					$"DROP TABLE IF EXISTS version{currentVersion}cumulative;" +
+					$"DROP TABLE IF EXISTS version{currentVersion}cumulative;\n" +
 					$"CREATE TABLE version{currentVersion}cumulative (\n" +
 						$"\t\"{_categories[(int)_categoryNames.WeaponName]}\" TEXT,\n" +
 						$"\t\"{_categories[(int)_categoryNames.Category]}\" TEXT,\n" +
@@ -442,6 +447,7 @@ namespace PFDB.SQLite
 						$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\" INTEGER,\n" +
 						$"\t\"{_categories[(int)_categoryNames.Rank]}\" INTEGER,\n" +
 						$"\t\"{_categories[(int)_categoryNames.UniqueWeaponID]}\" INTEGER\n" +
+						$"\t\"{_categories[(int)_categoryNames.WeaponNumberInVersion]}\" INTEGER\n" +
 					$");" +
 					$"INSERT INTO version{currentVersion}cumulative (\n" +
 						$"\t\"{_categories[(int)_categoryNames.WeaponName]}\",\n" +
@@ -456,12 +462,54 @@ namespace PFDB.SQLite
 						$"\t\"{_categories[(int)_categoryNames.CategoryNumber]}\",\n" +
 						$"\t\"{_categories[(int)_categoryNames.CategoryShorthand]}\",\n" +
 						$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\",\n" +
-						$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n" +
-					"FROM version800;"
+						$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n"
 				);
+				if (currentVersion == firstVersion)
+				{
+
+					cleanText.Append($"FROM version{firstVersion};\n");
+					previousVersion = currentVersion;
+					continue;
+				}
+				cleanText.Append($"FROM version{previousVersion}cumulative;\n");
+
+				//foreach (int currentVersion in versionInts.Where(x => x <= limitVersion))
+				//{
+				cleanText.Append(
+					$"DELETE FROM version{currentVersion}cumulative\n" +
+					$"WHERE version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} \n" +
+					$"IN (\n" +
+						$"\tSELECT version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} \n" +
+						$"\tFROM version{currentVersion}cumulative \n" +
+						$"\tINNER JOIN version{currentVersion} \n" +
+						$"\tON (version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} = version{currentVersion}.{_categories[(int)_categoryNames.WeaponName]}) \n" +
+						$"\tWHERE version{currentVersion}cumulative.{_categories[(int)_categoryNames.WeaponName]} IS NOT NULL AND version{currentVersion}.{_categories[(int)_categoryNames.WeaponName]} IS NOT NULL \n" +
+					$");\n" +
+					$"INSERT INTO version{currentVersion}cumulative (\n" +
+						$"\t\"{_categories[(int)_categoryNames.WeaponName]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.Category]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.CategoryNumber]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.CategoryShorthand]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n" +
+					$") SELECT \n" +
+						$"\t\"{_categories[(int)_categoryNames.WeaponName]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.Category]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.CategoryNumber]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.CategoryShorthand]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\",\n" +
+						$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n" +
+					$"FROM version{currentVersion};\n"
+				);
+				//}
+				
+				previousVersion = currentVersion;
 			}
+
 			cleanText.Append(deletionCommandText);
 
+			//Console.WriteLine(cleanText);
+			//return;
 			//the SQL command has been prepared to set up the tables up to this point
 
 
@@ -478,7 +526,7 @@ namespace PFDB.SQLite
 					Stopwatch stopwatch1 = Stopwatch.StartNew();
 					command.ExecuteNonQuery();
 					stopwatch1.Stop();
-					PFDBLogger.LogStopwatch(stopwatch1, $"Clean duration");
+					PFDBLogger.LogStopwatch(stopwatch1, $"Clean and build (all versions below {maximumVersion.VersionNumber}) duration");
 
 
 					string updateCommandText = string.Empty;
@@ -494,8 +542,12 @@ namespace PFDB.SQLite
 							$"\t\"{_categories[(int)_categoryNames.CategoryShorthand]}\",\n" +
 							$"\t\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\",\n" +
 							$"\t\"{_categories[(int)_categoryNames.Rank]}\"\n" +
-						$"FROM version{currentVersionNumber}cumulative;\n";
+						$"FROM version{currentVersionNumber}cumulative\n" +
+						$"ORDER BY \"{_categories[(int)_categoryNames.CategoryNumber]}\" ASC," +
+						$"\"{_categories[(int)_categoryNames.Rank]}\" ASC," +
+						$"\"{_categories[(int)_categoryNames.VersionRankTieBreaker]}\" ASC;\n";
 
+						//PFDBLogger.LogInformation(command.CommandText);
 						PFDBLogger.LogDebug(command.CommandText);
 						HashSet<WeaponIdentification> currentVersionRowResults = new HashSet<WeaponIdentification>();
 
@@ -530,7 +582,7 @@ namespace PFDB.SQLite
 					command.CommandText = updateCommandText;
 					command.ExecuteNonQuery();
 					stopwatch1.Stop();
-					PFDBLogger.LogStopwatch(stopwatch1, $"Update duration");
+					PFDBLogger.LogStopwatch(stopwatch1, $"Update weapon IDs duration");
 					PFDBLogger.LogDebug(command.CommandText);
 
 

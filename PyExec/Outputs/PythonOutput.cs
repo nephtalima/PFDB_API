@@ -1,34 +1,30 @@
 ﻿using PFDB.PythonExecutionUtility;
 
-namespace PFDB
+namespace PFDB.PythonExecution;
+
+
+/// <summary>
+/// Default implementation of <see cref="IOutput"/>.
+/// </summary>
+public class PythonOutput : IOutput
 {
-    namespace PythonExecution
+    /// <summary>
+    /// Output string.
+    /// </summary>
+    public string OutputString { get; init; }
+
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
+    /// <param name="outputString">Output string from result.</param>
+    public PythonOutput(string outputString)
     {
-        /// <summary>
-        /// Default implementation of <see cref="IOutput"/>.
-        /// </summary>
-        public class PythonOutput : IOutput
-        {
-            /// <summary>
-            /// Output string.
-            /// </summary>
-            public string OutputString { get; init; }
+        OutputString = outputString;
+    }
 
-            /// <summary>
-            /// Default constructor.
-            /// </summary>
-            /// <param name="outputString">Output string from result.</param>
-            public PythonOutput (string outputString)
-            {
-                OutputString = outputString;
-            }
-
-			/// <inheritdoc/>
-			public new string ToString()
-			{
-				return OutputString;
-			}
-		}
-
+    /// <inheritdoc/>
+    public new string ToString()
+    {
+        return OutputString;
     }
 }

@@ -8,6 +8,9 @@ import cv2
 import pytesseract
 import os
 
+#todo: add option to have many small images or one big image
+#also, add comments to save my sanity every time i open this file
+
 # Thin font function
 def thinFontPreprocessing(image):
 	kernel = numpy.ones((2,2),numpy.uint8)
@@ -18,7 +21,7 @@ def testAndReadImage(image):
 	# print(os.environ["pythonSignalText"])
 	if type(image) is str:
 		#print(fullscreen_image)
-		print("Does the file exist? " + str(os.path.exists(image)))
+		print("Does the file " + image + " exist? " + str(os.path.exists(image)))
 		image = cv2.imread(image)
 	return image
 
@@ -142,6 +145,8 @@ class ImageParser:
 			d_crop = fullscreen_image[365:472, 1580:1850]
 			f_crop = fullscreen_image[500:720, 1580:1850]
 			
+
+
 			if rank == 0:
 				crops.append(("Ballistics", b_crop))
 				crops.append(("Accuracies", a_crop))
@@ -442,6 +447,8 @@ VERSION: specifies the version of Phantom Forces
 	Versions to be implemented: 800, 801, 802 
 	Currently supported versions: 902, 903, 1001, 1010
 	Experimental versions: 9999, 9998
+
+	pen
 		""")
 		return
 	

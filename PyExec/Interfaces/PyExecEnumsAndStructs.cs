@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PFDB.PythonExecutionUtility
+﻿namespace PFDB.PythonExecutionUtility
 {
 	/// <summary>
 	/// Specifies the output destination. Use <c><see cref="OutputDestination.Console"/> | <see cref="OutputDestination.File"/></c> to specify both outputs.

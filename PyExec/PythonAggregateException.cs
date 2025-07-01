@@ -1,52 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PFDB
+namespace PFDB;
+
+
+/// <summary>
+/// Used for throwing multiple exceptions that occured during Python execution
+/// </summary>
+public sealed class PythonAggregateException : SystemException
 {
 	/// <summary>
-	/// Used for throwing multiple exceptions that occured during Python execution
+	/// The error message.
 	/// </summary>
-	public sealed class PythonAggregateException : SystemException
+	public override string Message { get; }
+
+	internal List<SystemException> exceptions { get; set; }
+
+	/// <summary>
+	/// Default constructor.
+	/// </summary>
+	public PythonAggregateException()
 	{
-		/// <summary>
-		/// The error message.
-		/// </summary>
-		public override string Message { get; }
-
-		internal List<SystemException> exceptions { get; set; }
-
-		/// <summary>
-		/// Default constructor.
-		/// </summary>
-		public PythonAggregateException()
-		{
-			Message = "Multiple errors occured";
-			exceptions = new List<SystemException>();
-		}
-
-		/// <summary>
-		/// Default constructor, with message.
-		/// </summary>
-		/// <param name="message">The error message.</param>
-		public PythonAggregateException(string message) : base(message)
-		{
-			exceptions = new List<SystemException>();
-			Message = message;
-		}
-
-		/// <summary>
-		/// Default constructor, with message and inner exception.
-		/// </summary>
-		/// <param name="message">The error message.</param>
-		/// <param name="innerException">The encapsulated exception.</param>
-		public PythonAggregateException(string message, Exception innerException) : base(message, innerException)
-		{
-			exceptions = new List<SystemException>();
-			Message = message;
-		}
-
+		Message = "Multiple errors occured";
+		exceptions = new List<SystemException>();
 	}
+
+	/// <summary>
+	/// Default constructor, with message.
+	/// </summary>
+	/// <param name="message">The error message.</param>
+	public PythonAggregateException(string message) : base(message)
+	{
+		exceptions = new List<SystemException>();
+		Message = message;
+	}
+
+	/// <summary>
+	/// Default constructor, with message and inner exception.
+	/// </summary>
+	/// <param name="message">The error message.</param>
+	/// <param name="innerException">The encapsulated exception.</param>
+	public PythonAggregateException(string message, Exception innerException) : base(message, innerException)
+	{
+		exceptions = new List<SystemException>();
+		Message = message;
+	}
+
 }
+
 /*
 [global::System.Serializable]
 public class MyException : global::System.Exception

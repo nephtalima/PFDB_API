@@ -2,8 +2,8 @@
 
 
 a = Analysis(
-    ['C:\\Users\\Aethelhelm\\source\\repos\\PFDB_API\\ImageParserForAPI\\impa.py'],
-    pathex=['ath=[C:\\Users\\Aethelhelm\\AppData\\Local\\Programs\\Python\\Python312\\Scripts]'],
+    ['impa.py'],
+    pathex=[],
     binaries=[],
     datas=[],
     hiddenimports=[],
@@ -12,6 +12,7 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
+    optimize=0,
 )
 pyz = PYZ(a.pure)
 

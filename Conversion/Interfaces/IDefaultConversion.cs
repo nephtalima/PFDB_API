@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PFDB.ConversionUtility
+namespace PFDB.ConversionUtility;
+
+/// <summary>
+/// Interfaces that defines a single default conversion for weapons.
+/// </summary>
+public interface IDefaultConversion : IConversion
 {
-	/// <summary>
-	/// Interfaces that defines a single default conversion for weapons.
-	/// </summary>
-	public interface IDefaultConversion : IConversion
-	{
-	}
 }

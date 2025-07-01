@@ -4,13 +4,14 @@ using PFDB.WeaponUtility;
 using PFDB.Logging;
 using Serilog;
 using PFDB.PythonExecutionUtility;
-using PFDB.WeaponStructure;
 using PFDB.SQLite;
-using System.Collections.Immutable;
 using PFDB.ParsingUtility;
 using PFDB.PythonTesting;
 using PFDB.PythonFactoryUtility;
-using System.ComponentModel.Design;
+using static PFDB.Parsing.DefaultStatisticParameters;
+using System.Text;
+
+namespace PFDB;
 
 public class ComponentTester
 {
@@ -37,7 +38,8 @@ public class ComponentTester
 		Test = 1,
 		Build = 2,
 		Inventory = 3,
-		ManualProofread = 4
+		ManualProofread = 4,
+		Setup = 5
 
 
 	}
@@ -46,7 +48,23 @@ public class ComponentTester
 	{
 		//ConsoleColor initial = Console.BackgroundColor;
 		//Console.BackgroundColor = ConsoleColor.DarkRed;
-		Console.WriteLine("help message");
+		StringBuilder builder = new StringBuilder();
+
+		builder.Append("PFDB - Phantom Forces Database.\n");
+		builder.Append("This tool scans a bulk set of images and dumps the data into text files.\n");
+		builder.Append("It also parses the files and makes objects from them. Currently this does not do much, but will change.\n");
+		builder.Append('\n');
+		builder.Append("COMMAND OPTIONS:\n");
+		builder.Append("pfdb (COMMAND) [ARGUMENTS...]\n");
+		builder.Append('\n');
+		builder.Append("LIST OF COMMANDS:\n");
+		builder.Append("help\t\tDisplays this help message.\n");
+		builder.Append("test\t\tTests Python execution and file parsing capabilities.\n");
+		builder.Append("build\n");
+		builder.Append("inventory\n");
+		builder.Append("proofread\n");
+		Console.WriteLine(builder.ToString());
+
 		//Console.BackgroundColor = initial;
 	}
 
@@ -68,43 +86,44 @@ public class ComponentTester
 		{
 			case "--help":
 			case "help":
-			{
-				operation = Operations.Help;
-				displayHelp();
-				break;
-			}
+				{
+					operation = Operations.Help;
+					break;
+				}
 			case "test":
-			{
-				operation = Operations.Test;
-				break;
-			}
+				{
+					if (args.Length != 3 || args.Length != 4) operation = Operations.Help;
+					operation = Operations.Test;
+					break;
+				}
 			case "build":
-			{
-				operation = Operations.Build;
-				break;
-			}
+				{
+					operation = Operations.Build;
+					break;
+				}
 			case "inventory":
-			{
-				operation = Operations.Inventory;
-				break;
-			}
+				{
+					operation = Operations.Inventory;
+					break;
+				}
 			case "proofread":
-			{
-				operation = Operations.ManualProofread;
-				break;
-			}
+				{
+					operation = Operations.ManualProofread;
+					break;
+				}
 			default:
-			{
-				operation = Operations.Help;
-				break;
-			}
+				{
+					operation = Operations.Help;
+					break;
+				}
 		}
 
 		Console.WriteLine(operation);
 
 		PFDBLogger logger = new PFDBLogger(".pfdblog");
 
-		switch (operation) {
+		switch (operation)
+		{
 			case Operations.Help:
 				{
 					displayHelp();
@@ -112,6 +131,10 @@ public class ComponentTester
 				}
 			case Operations.Test:
 				{
+					if (args.Length == 3)
+						Test(args[1], args[2], null);
+					else if (args.Length == 4)
+						Test(args[1], args[2], args[3]);
 					break;
 				}
 			case Operations.Build:
@@ -128,7 +151,7 @@ public class ComponentTester
 				}
 
 		}
-		
+
 		/*
 		if(test){
 			int score = 0;
@@ -169,12 +192,15 @@ public class ComponentTester
 			
 		}
 		*/
+		//WeaponTable.InitializeEverything();
 		Log.Logger.Information("Application end. Logging has finished.");
 		return;
 	}
 
-	public static bool Test()
+	public static bool Test(string pythonProgramPath, string imageBasePath, string? tessbinPath)
 	{
+		ParseTesting.Test(AcceptableSpaces, AcceptableCorruptedWordSpaces, StringComparisonMethod);
+		PythonTest.Test(pythonProgramPath, imageBasePath, tessbinPath);
 		return true;
 	}
 
@@ -198,12 +224,12 @@ public class ComponentTester
 
 		foreach (PhantomForcesVersion version in WeaponTable.ListOfVersions)
 		{
-			IDictionary<Categories, int> weaponCounts = WeaponTable.WeaponCounts[version]; //maximum number of weapons in the category
+			//IDictionary<Categories, int> weaponCounts = WeaponTable.WeaponCounts[version]; //maximum number of weapons in the category
 			Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
-			foreach (Categories category in weaponCounts.Keys)
+			foreach (Categories category in WeaponTable.WeaponCounts[version].Keys)
 			{
 				List<int> tempList = new List<int>();
-				for (int i = 0; i < weaponCounts[category]; ++i)
+				for (int i = 0; i < WeaponTable.WeaponCounts[version][category]; ++i)
 				{
 					tempList.Add(i);
 				}
@@ -222,24 +248,28 @@ public class ComponentTester
 
 	}
 
-	public static void buildSpecificVersion(string imageBasePath, string pythonProgramPath, string? tessbinPath, PhantomForcesVersion version){
+	public static void buildSpecificVersion(string imageBasePath, string pythonProgramPath, string? tessbinPath, PhantomForcesVersion version)
+	{
 		//verify path
 		//string sourcePath = "/mnt/bulkdata/Programming/PFDB/PFDB_API/textOutputsByVersion/version1001";
 		//PhantomForcesVersion version = new PhantomForcesVersion(10,0,1);
-		
 
-		if(Directory.Exists(imageBasePath) == false){
+
+		if (Directory.Exists(imageBasePath) == false)
+		{
 			PFDBLogger.LogError($"Directory path was not found: {imageBasePath}");
 			return;
 			//throw new DirectoryNotFoundException($"Directory path was not found: {imageBasePath}");
 		}
 
-		
-		IDictionary<Categories, int> weaponCounts = WeaponTable.WeaponCounts[version]; //maximum number of weapons in the category
+
+		//IDictionary<Categories, int> weaponCounts = WeaponTable.WeaponCounts[version]; //maximum number of weapons in the category
 		Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
-		foreach(Categories category in weaponCounts.Keys){
+		foreach (Categories category in WeaponTable.WeaponCounts[version].Keys)
+		{
 			List<int> tempList = new List<int>();
-			for(int i = 0; i < weaponCounts[category]; ++i){
+			for (int i = 0; i < WeaponTable.WeaponCounts[version][category]; ++i)
+			{
 				tempList.Add(i);
 			}
 			weaponNumbers.Add(category, tempList);
@@ -248,24 +278,45 @@ public class ComponentTester
 		{
 			{ version, $"{imageBasePath}{PyUtilityClass.slash}version{version.VersionNumber}{PyUtilityClass.slash}" }
 		};
-		PythonExecutionFactory<PythonTesseractExecutable> factory = 
-		new PythonExecutionFactory<PythonTesseractExecutable>(new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>>{{version, weaponNumbers}}, versionAndPathPairs, pythonProgramPath, OutputDestination.Console | OutputDestination.File, tessbinPath);
+		PythonExecutionFactory<PythonTesseractExecutable> factory =
+		new PythonExecutionFactory<PythonTesseractExecutable>(new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>> { { version, weaponNumbers } }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console | OutputDestination.File, tessbinPath);
 		IPythonExecutionFactoryOutput factoryOutput = factory.Start();
 		PFDBLogger.LogWarning("The following files are missing:");
-		foreach(string str in factoryOutput.MissingFiles){
+		foreach (string str in factoryOutput.MissingFiles)
+		{
 			Console.WriteLine(str);
 		}
 
 
 		//verify number of images
-		
+
 	}
-
-
-
-
-
-
 }
 
+/*
+< PreBuildEvent Condition="Exists('C:/') and !Exists('./disablePreBuildEvent')"><!--Windows build-->
+	xcopy $(SolutionDir)Calculator\Calculator.dll $(SolutionDir)ComponentTester\bin\$(Configuration)\$(TargetFramework)\ /y /f /v		  
+	xcopy $(SolutionDir)ImageParserForAPI\dist\impa.exe $(SolutionDir)ImageParserForAPI\ /y /f /v
+	mkdir $(SolutionDir)ComponentTester\bin\$(Configuration)\$(TargetFramework)\tessbin
+	xcopy $(SolutionDir)ImageParserForAPI\tessbin\ $(SolutionDir)ComponentTester\bin\$(Configuration)\$(TargetFramework)\tessbin\ /y /f /v /e /h /j
+	xcopy $(SolutionDir)ImageParserForAPI\dist\impa.exe $(SolutionDir)ComponentTester\bin\$(Configuration)\$(TargetFramework)\ /y /f /v
+	xcopy $(SolutionDir)weapon_database.db $(SolutionDir)ComponentTester\bin\$(Configuration)\$(TargetFramework)\ /y /f /v
+	</PreBuildEvent>
+<PreBuildEvent Condition="Exists('/usr/bin') and Exists('$(SolutionDir)') and !Exists('./disablePreBuildEvent')"><!--Linux build-->
+	cp -vaf $(SolutionDir)Calculator/Calculator.dll $(SolutionDir)ComponentTester/bin/$(Configuration)/$(TargetFramework)		  
+	cp -vaf $(SolutionDir)ImageParserForAPI/dist/impa $(SolutionDir)ImageParserForAPI
+	mkdir $(SolutionDir)ComponentTester/bin/$(Configuration)/$(TargetFramework)/tessbin
+	cp -vaf $(SolutionDir)ImageParserForAPI/tessbin $(SolutionDir)ComponentTester/bin/$(Configuration)/$(TargetFramework)/tessbin
+	cp -vaf $(SolutionDir)ImageParserForAPI/dist/impa $(SolutionDir)ComponentTester/bin/$(Configuration)/$(TargetFramework)
+	cp -vaf $(SolutionDir)weapon_database.db $(SolutionDir)ComponentTester/bin/$(Configuration)/$(TargetFramework)
+	</PreBuildEvent>
+<PreBuildEvent Condition="Exists('/usr/bin') and !Exists('$(SolutionDir)') and !Exists('./disablePreBuildEvent')"><!--Linux build-->
+	cp -vaf ../../../../Calculator/Calculator.dll ../../../../ComponentTester/bin/$(Configuration)/$(TargetFramework)		  
+	cp -vaf ../../../../ImageParserForAPI/dist/impa ../../../../ImageParserForAPI
+	mkdir ../../../../ComponentTester/bin/$(Configuration)/$(TargetFramework)/tessbin
+	cp -vaf ../../../../ImageParserForAPI/tessbin ../../../../ComponentTester/bin/$(Configuration)/$(TargetFramework)/tessbin
+	cp -vaf ../../../../ImageParserForAPI/dist/impa ../../../../ComponentTester/bin/$(Configuration)/$(TargetFramework)
+	cp -vaf ../../../../weapon_database.db ../../../../ComponentTester/bin/$(Configuration)/$(TargetFramework)
+</PreBuildEvent>
 
+*/

@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Conversion\Conversion.csproj" />
-    <ProjectReference Include="..\PyExec\PyExec.csproj" />
+    <!--<ProjectReference Include="..\PyExec\PyExec.csproj" />-->
   </ItemGroup>
 
 </Project>

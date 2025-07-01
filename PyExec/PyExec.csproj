@@ -7,28 +7,13 @@
     <Nullable>enable</Nullable>
 	<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    
-	  <PreBuildEvent Condition="Exists('C:\')"><!--Windows Build-->
-		  py -m PyInstaller -path=[C:\Users\Aethelhelm\AppData\Local\Programs\Python\Python313\Scripts] --workpath $(SolutionDir)ImageParserForAPI\build --distpath $(SolutionDir)ImageParserForAPI\dist -F $(SolutionDir)ImageParserForAPI\impa.py
-		  xcopy $(SolutionDir)ImageParserForAPI\dist\impa.exe $(SolutionDir)ImageParserForAPI\ /y /f /v
-		  mkdir $(SolutionDir)PyExec\bin\$(Configuration)\$(TargetFramework)\tessbin
-		  xcopy $(SolutionDir)ImageParserForAPI\tessbin\ $(SolutionDir)PyExec\bin\$(Configuration)\$(TargetFramework)\tessbin\ /y /f /v /e /h /j
-		  xcopy $(SolutionDir)ImageParserForAPI\dist\impa.exe $(SolutionDir)PyExec\bin\$(Configuration)\$(TargetFramework)\ /y /f /v
-	  </PreBuildEvent>
-    <PreBuildEvent Condition="Exists('/usr/bin') and Exists('$(SolutionDir)')"><!--Linux Build, solution build-->
-      $(SolutionDir)/bin/python -m PyInstaller --workpath $(SolutionDir)ImageParserForAPI/build --distpath $(SolutionDir)ImageParserForAPI/dist -F -n impa -c $(SolutionDir)ImageParserForAPI/impa.py
-      cp -vaf $(SolutionDir)ImageParserForAPI/dist/impa $(SolutionDir)ImageParserForAPI
-      mkdir $(SolutionDir)PyExec/bin/$(Configuration)/$(TargetFramework)/tessbin
-      cp -vaf $(SolutionDir)ImageParserForAPI/tessbin $(SolutionDir)PyExec/bin/$(Configuration)/$(TargetFramework)
-      cp -vaf $(SolutionDir)ImageParserForAPI/dist/impa $(SolutionDir)PyExec/bin/$(Configuration)/$(TargetFramework)
+    <PreBuildEvent Condition="Exists('C:\')"><!--Windows Build-->
+        py -m PyInstaller -path=[C:\Users\Aethelhelm\AppData\Local\Programs\Python\Python313\Scripts] --workpath $(SolutionDir)ImageParserForAPI\build --distpath $(SolutionDir)ImageParserForAPI\dist -F $(SolutionDir)ImageParserForAPI\impa.py
+        mkdir $(SolutionDir)PyExec\bin\$(Configuration)\$(TargetFramework)\tessbin
+        xcopy $(SolutionDir)ImageParserForAPI\tessbin\ $(SolutionDir)PyExec\bin\$(Configuration)\$(TargetFramework)\tessbin\ /y /f /v /e /h /j
+        xcopy $(SolutionDir)ImageParserForAPI\dist\impa.exe $(SolutionDir)PyExec\bin\$(Configuration)\$(TargetFramework)\ /y /f /v
     </PreBuildEvent>
-    <PreBuildEvent Condition="Exists('/usr/bin') and !Exists('$(SolutionDir)')"><!--Linux Build, project build-->
-      ../../../../bin/python -m PyInstaller --workpath ../../../../ImageParserForAPI/build --distpath ../../../../ImageParserForAPI/dist -F -n impa -c ../../../../ImageParserForAPI/impa.py
-      cp -vaf ../../../../ImageParserForAPI/dist/impa ../../../../ImageParserForAPI
-      mkdir ../../../../PyExec/bin/$(Configuration)/$(TargetFramework)/tessbin
-      cp -vaf ../../../../ImageParserForAPI/tessbin ../../../../PyExec/bin/$(Configuration)/$(TargetFramework)
-      cp -vaf ../../../../ImageParserForAPI/dist/impa ../../../../PyExec/bin/$(Configuration)/$(TargetFramework)
-    </PreBuildEvent>
+	  
     <Configurations>Debug;Release;Generalx64BuildDebug;Generalx64BuildRelease</Configurations>
   </PropertyGroup>
   <ItemGroup>
