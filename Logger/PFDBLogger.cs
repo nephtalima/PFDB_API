@@ -78,8 +78,8 @@ public class PFDBLogger
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (disableSourceCaller == false) stringBuilder.Append($"[Source: {invokingAssembly.GetName().Name}.{cls}.{caller}] \n\t");
-		stringBuilder.Append($"\t\t Elapsed time: {stopwatch.Elapsed.ToString(@"mm\:ss\.ffffff")}");
-		stringBuilder.Append($"\t Message: {message}");
+		stringBuilder.Append($"\t\t \u001b[0;30mElapsed time: {stopwatch.Elapsed.ToString(@"mm\:ss\.ffffff")}");
+		stringBuilder.Append($"\t Message:\u001b[0;0m {message}");
 		if (parameter?.Length != 0 && parameter != null) stringBuilder.Append($"\t [Parameter: {{parameter}}]");
 
 		Log.Information(stringBuilder.ToString(), parameter);
@@ -101,7 +101,7 @@ public class PFDBLogger
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (disableSourceCaller == false) stringBuilder.Append($"[Source: {invokingAssembly.GetName().Name}.{cls}.{caller}] \n\t");
-		stringBuilder.Append($"\t Message: {message} ");
+		stringBuilder.Append($"\t \u001b[0;30mMessage:\u001b[0;0m {message} ");
 		if (parameter?.Length != 0 && parameter != null) stringBuilder.Append($"\t [Parameter: {{parameter}}]");
 
 		Log.Debug(stringBuilder.ToString(), parameter);
@@ -127,7 +127,7 @@ public class PFDBLogger
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (disableSourceCaller == false) stringBuilder.Append($"[Source: {invokingAssembly.GetName().Name}.{cls}.{caller}] \n\t");
-		stringBuilder.Append($"\t Message: {message} ");
+		stringBuilder.Append($"\t \u001b[0;30mMessage:\u001b[0;0m {message} ");
 		if (parameter?.Length != 0 && parameter?.Length != 0 && parameter != null) stringBuilder.Append($"\t [Parameter: {{parameter}}]");
 
 		Log.Information(stringBuilder.ToString(), parameter);
@@ -152,7 +152,7 @@ public class PFDBLogger
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (disableSourceCaller == false) stringBuilder.Append($"[Source: {invokingAssembly.GetName().Name}.{cls}.{caller}] \n\t");
-		stringBuilder.Append($"\t Message: {message} ");
+		stringBuilder.Append($"\t \u001b[0;30mMessage:\u001b[0;0m {message} ");
 		if (parameter?.Length != 0 && parameter != null) stringBuilder.Append($"\t [Parameter: {{parameter}}]");
 
 		Log.Warning(stringBuilder.ToString(), parameter);
@@ -177,7 +177,7 @@ public class PFDBLogger
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (disableSourceCaller == false) stringBuilder.Append($"[Source: {invokingAssembly.GetName().Name}.{cls}.{caller}] \n\t");
-		stringBuilder.Append($"\t Message: {message} ");
+		stringBuilder.Append($"\t \u001b[0;30mMessage:\u001b[0;0m {message} ");
 		if (parameter?.Length != 0 && parameter != null) stringBuilder.Append($"\t [Parameter: {{parameter}}]");
 
 		Log.Error(stringBuilder.ToString(), parameter);
@@ -202,7 +202,7 @@ public class PFDBLogger
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (disableSourceCaller == false) stringBuilder.Append($"[Source: {invokingAssembly.GetName().Name}.{cls}.{caller}] \n\t");
-		stringBuilder.Append($"\t Message: {message} ");
+		stringBuilder.Append($"\t \u001b[0;30mMessage:\u001b[0;0m {message} ");
 		if (parameter?.Length != 0 && parameter != null) stringBuilder.Append($"\t [Parameter: {{parameter}}]");
 
 		Log.Fatal(stringBuilder.ToString(), parameter);

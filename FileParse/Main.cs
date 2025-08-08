@@ -37,28 +37,38 @@ public static class ParseTesting {
     /// <param name="acceptableSpaces"></param>
     /// <param name="acceptableCorruptedWordSpaces">Specifies the number of </param>
     /// <param name="stringComparisonMethod"></param>
-    public static bool Test(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod = StringComparison.InvariantCultureIgnoreCase)
+    public static bool Test(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod /*= StringComparison.InvariantCultureIgnoreCase*/)
     {
         int score = 0;
+        PFDBLogger.LogInformation("\u001b[1;35mBeginning parse testing:");
+        PFDBLogger.LogInformation("");
         if (IndexSearchSingleCharacterTest(stringComparisonMethod)) score++;
         if (IndexSearchSingleWordTest(stringComparisonMethod)) score++;
         if (IndexSearchNoOccurencesTest(stringComparisonMethod)) score++;
         if (CorruptedWordFixTest(acceptableSpaces, acceptableCorruptedWordSpaces, stringComparisonMethod)) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         if (StatisticParseMatchTest(acceptableSpaces, acceptableCorruptedWordSpaces, stringComparisonMethod)) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         if (SearchTargetToStatisticOptionTest()) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         if (StatisticOptionToSearchTargetTest()) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         if (FileReaderTest()) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         if (FileParseCompleteTest(acceptableSpaces, acceptableCorruptedWordSpaces, stringComparisonMethod)) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         if (AddingIncompatibleWeaponsToStatisticCollectionTest()) score++;
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         bool pass = TestingOutput("All FileParse tests", score >= 10, "10", score.ToString());
         PFDBLogger.LogInformation("________________");
+        PFDBLogger.LogInformation("");
         PFDBLogger.LogInformation("");
         return pass;
 
@@ -176,14 +186,19 @@ public static class ParseTesting {
         statisticCollection.Add(statisticTest);
         try {
             statisticCollection.Add(new Statistic(false, "10.00", new WeaponIdentification(new PhantomForcesVersion("10.1.0"), Categories.PersonalDefenseWeapons, 0, 0, "MP5K"), StatisticOptions.ReloadTime));
+            PFDBLogger.LogError("\u001b[0;31mUnsuccessfully\u001b[0;0m caught the previous exception when executing StatisticCollection.Add(IEnumerable<IStatistic>)");
         } catch (ArgumentException) {
-            PFDBLogger.LogInformation("Successfully caught the previous exception when executing StatisticCollection.Add(IStatistic)");
+            PFDBLogger.LogInformation("\u001b[0;32mSuccessfully\u001b[0;0m caught the previous exception when executing StatisticCollection.Add(IStatistic)");
             score++;
         }
-        try {
+        try
+        {
             statisticCollection.AddRange(new List<IStatistic>() { new Statistic(false, "10.00", new WeaponIdentification(new PhantomForcesVersion("10.1.0"), Categories.PersonalDefenseWeapons, 0, 0, "MP5K"), StatisticOptions.ReloadTime) });
-        } catch (ArgumentException) {
-            PFDBLogger.LogInformation("Successfully caught the previous exception when executing StatisticCollection.AddRange(IEnumerable<IStatistic>)");
+            PFDBLogger.LogError("\u001b[0;31mUnsuccessfully\u001b[0;0m caught the previous exception when executing StatisticCollection.AddRange(IEnumerable<IStatistic>)");
+        }
+        catch (ArgumentException)
+        {
+            PFDBLogger.LogInformation("\u001b[0;32mSuccessfully\u001b[0;0m caught the previous exception when executing StatisticCollection.AddRange(IEnumerable<IStatistic>)");
             score++;
         }
 
@@ -222,7 +237,7 @@ public static class ParseTesting {
                 score++;
             }
         }
-        return TestingOutput("All conversions from StatisticOptions to SearchTargets passed.", score >= 7, "7", score.ToString());
+        return TestingOutput("All conversions from StatisticOptions to SearchTargets", score >= 7, "7", score.ToString());
     }
 
     /// <summary>
@@ -265,7 +280,7 @@ public static class ParseTesting {
                 score++;
             }
         }
-        return TestingOutput("All conversions from SearchTargets to StatisticOptions passed.", score >= 7, "7", score.ToString());
+        return TestingOutput("All conversions from SearchTargets to StatisticOptions", score >= 7, "7", score.ToString());
     }
 
     /// <summary>
@@ -285,7 +300,7 @@ public static class ParseTesting {
             parser.FileReader($"{guid}.error");
             PFDBLogger.LogError($"{guid}.error should not exist. Run this test again.");
         } catch (FileNotFoundException) {
-            PFDBLogger.LogInformation("Successfully caught previous exception (FileNotFoundException).");
+            PFDBLogger.LogInformation("\u001b[0;32mSuccessfully caught previous exception (FileNotFoundException).");
             score++;
         } catch (Exception e) {
             PFDBLogger.LogWarning($"Something bad happened. Was expecting FileNotFoundException but got another exception instead. Message: {e.Message}");
@@ -549,10 +564,10 @@ public static class ParseTesting {
     public static bool TestingOutput(string testName, bool pass, string expectedOutput, string actualOutput, [CallerMemberName] string caller = "") {
         string originalCaller = caller ?? "";
         if (pass) {
-            PFDBLogger.LogInformation($"{testName} passed. Expected: {expectedOutput}. Got: {actualOutput}", originalCaller);
+            PFDBLogger.LogInformation($"{testName}\u001b[1;32m passed.\u001b[0;0m Expected: {expectedOutput}. Got: {actualOutput}", originalCaller);
             return true;
         } else {
-            PFDBLogger.LogError($"{testName} failed. Expected: {expectedOutput}. Got: {actualOutput}", originalCaller);
+            PFDBLogger.LogError($"{testName}\u001b[1;31m failed.\u001b[0;0m Expected: {expectedOutput}. Got: {actualOutput}", originalCaller);
             return false;
         }
     }

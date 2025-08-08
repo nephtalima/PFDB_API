@@ -71,15 +71,23 @@ public class ComponentTester
 	public static void Main(string[] args)
 	{
 
-		Operations operation = Operations.Help;
-
 		if (args.Length == 0)
 		{
 			displayHelp();
 			return;
 		}
 
+
+		for (int i = 0; i < args.Length; ++i)
+		{
+			Console.WriteLine($"arg{i}: {args[i]}");
+		}
+
+		Operations operation = Operations.Help;
+
+
 		Console.WriteLine(args[0]);
+		Console.WriteLine(args.Length);
 
 
 		switch (args[0].ToLowerInvariant())
@@ -92,7 +100,7 @@ public class ComponentTester
 				}
 			case "test":
 				{
-					if (args.Length != 3 || args.Length != 4) operation = Operations.Help;
+					if (args.Length < 1 || args.Length > 9) operation = Operations.Help;
 					operation = Operations.Test;
 					break;
 				}
@@ -121,7 +129,8 @@ public class ComponentTester
 		Console.WriteLine(operation);
 
 		PFDBLogger logger = new PFDBLogger(".pfdblog");
-
+		
+		const int argsOffset = 2;
 		switch (operation)
 		{
 			case Operations.Help:
@@ -131,10 +140,81 @@ public class ComponentTester
 				}
 			case Operations.Test:
 				{
-					if (args.Length == 3)
-						Test(args[1], args[2], null);
-					else if (args.Length == 4)
-						Test(args[1], args[2], args[3]);
+					if (args.Length < 2)
+					{
+						Test.DisplayTestHelp();
+						break;
+					}
+						
+					switch (args[1].ToLowerInvariant())
+					{
+						case "all":
+							{
+								string?[]? allargs = { null, null, null, null, null};
+								for (int i = argsOffset; i < args.Length; i++)
+								{
+									//Console.WriteLine($"arg {i}: {args[i] ?? "was null"}");
+									allargs[i - argsOffset] = args[i];
+								}
+	
+								int? acceptableSpaces = null;
+								int? acceptableCorruptedWordSpaces = null;
+								if(allargs[3] != null)
+									acceptableSpaces = Convert.ToInt32(allargs[3]);
+								if(allargs[4] != null)
+									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[4]);
+
+
+								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+								Test.TestAll(allargs[0], allargs[1], allargs[2],
+									acceptableSpaces: acceptableSpaces,
+									acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
+									null);
+								break;
+							}
+						case "py":
+						case "python":
+							{
+								string?[]? allargs = {null, null, null};
+								for (int i = argsOffset; i < args.Length; i++)
+								{
+									//Console.WriteLine($"arg {i}: {args[i] ?? "was null"}");
+									allargs[i - argsOffset] = args[i];
+								}
+
+
+								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}");
+								Test.TestPython(pythonProgramPath: allargs[0], imageBasePath: allargs[1], tessbinPath: allargs[2]); 
+								break;
+							}
+						case "parse":
+							{
+								string?[]? allargs = { null, null};
+								for (int i = argsOffset; i < args.Length; i++)
+								{
+									//Console.WriteLine($"arg {i}: {args[i] ?? "was null"}");
+									allargs[i - argsOffset] = args[i];
+								}
+								int? acceptableSpaces = null;
+								int? acceptableCorruptedWordSpaces = null;
+								if(allargs[0] != null)
+									acceptableSpaces = Convert.ToInt32(allargs[0]);
+								if(allargs[1] != null)
+									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[1]);
+
+								//PFDBLogger.LogInformation($"acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+								Test.TestParse(
+									acceptableSpaces: acceptableSpaces,
+									acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
+									null);
+								break;
+							}
+						default:
+							{
+								Test.DisplayTestHelp();
+								break;
+							}
+					}
 					break;
 				}
 			case Operations.Build:
@@ -195,13 +275,6 @@ public class ComponentTester
 		//WeaponTable.InitializeEverything();
 		Log.Logger.Information("Application end. Logging has finished.");
 		return;
-	}
-
-	public static bool Test(string pythonProgramPath, string imageBasePath, string? tessbinPath)
-	{
-		ParseTesting.Test(AcceptableSpaces, AcceptableCorruptedWordSpaces, StringComparisonMethod);
-		PythonTest.Test(pythonProgramPath, imageBasePath, tessbinPath);
-		return true;
 	}
 
 	public static void inventory()
