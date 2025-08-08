@@ -8,7 +8,6 @@
     <Configurations>Debug;Release;Generalx64BuildDebug;Generalx64BuildRelease</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logger\PFDBLogger.csproj" />
     <ProjectReference Include="..\WeaponUtility2\WeaponUtility2.csproj" />
   </ItemGroup>
 </Project>

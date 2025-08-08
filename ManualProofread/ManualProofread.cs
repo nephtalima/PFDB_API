@@ -1,13 +1,9 @@
-﻿using PFDB;
-using PFDB.Proofreading;
-using PFDB.Parsing;
+﻿using PFDB.StatisticStructure;
 using PFDB.WeaponStructure;
 using PFDB.WeaponUtility;
 using PFDB.ConversionUtility;
-using PFDB.StatisticUtility;
 using PFDB.Logging;
 using PFDB.ManualProofread;
-using PFDB.SQLite;
 
 ManualProofread proofread = new ManualProofread(PhantomForcesDataModel.GetWeaponCollection(new PhantomForcesVersion("10.1.1")));
 
