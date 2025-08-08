@@ -44,6 +44,7 @@ public class ComponentTester
 
 	}
 
+	// displays help
 	public static void displayHelp()
 	{
 		//ConsoleColor initial = Console.BackgroundColor;
@@ -66,6 +67,25 @@ public class ComponentTester
 		Console.WriteLine(builder.ToString());
 
 		//Console.BackgroundColor = initial;
+	}
+
+	/*
+	 *	Makes sure that we don't get an indexOutOfBoundsException
+	 *	basically we don't know how many parameters that the user is going to fill up when they call the command
+	 *	so we have a maximum of n parameters
+	 *	and so we need to account for the very first two parameters being the main operation followed by a subcommand
+	 *	i.e. /pfdb (operation) (sub-command) [actual parameters we care about]
+	 *	then we store those into an array and return that
+	 */
+	public static List<string?> argumentFiller(string[] args, int argsOffset = 2){
+
+		List<string?> allargs = new List<string?>();
+		for(int i = argsOffset; i < args.Length; ++i){
+			allargs.Add(args[i]);
+		}
+		allargs.EnsureCapacity(args.Length - argsOffset);
+
+		return allargs;
 	}
 
 	public static void Main(string[] args)
@@ -150,19 +170,28 @@ public class ComponentTester
 					{
 						case "all":
 							{
-								string?[]? allargs = { null, null, null, null, null};
-								for (int i = argsOffset; i < args.Length; i++)
-								{
-									//Console.WriteLine($"arg {i}: {args[i] ?? "was null"}");
-									allargs[i - argsOffset] = args[i];
-								}
+								
+								List<string?> allargs = argumentFiller(args, argsOffset);
 	
 								int? acceptableSpaces = null;
 								int? acceptableCorruptedWordSpaces = null;
-								if(allargs[3] != null)
+								if(allargs[3] != null){
 									acceptableSpaces = Convert.ToInt32(allargs[3]);
-								if(allargs[4] != null)
+									if(acceptableSpaces < 0){
+										PFDBLogger.LogError("acceptableSpaces cannot be negative. Exiting.");
+										break;
+									} 
+								}
+
+								if(allargs[4] != null){
 									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[4]);
+									if(acceptableCorruptedWordSpaces < 0){
+										PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
+										break;
+									} 
+								}
+
+
 
 
 								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
@@ -197,11 +226,21 @@ public class ComponentTester
 								}
 								int? acceptableSpaces = null;
 								int? acceptableCorruptedWordSpaces = null;
-								if(allargs[0] != null)
+								if(allargs[0] != null){
 									acceptableSpaces = Convert.ToInt32(allargs[0]);
-								if(allargs[1] != null)
-									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[1]);
+									if(acceptableSpaces < 0){
+										PFDBLogger.LogError("acceptableSpaces cannot be negative. Exiting.");
+										break;
+									} 
+								}
 
+								if(allargs[1] != null){
+									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[1]);
+									if(acceptableCorruptedWordSpaces < 0){
+										PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
+										break;
+									} 
+								}
 								//PFDBLogger.LogInformation($"acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
 								Test.TestParse(
 									acceptableSpaces: acceptableSpaces,

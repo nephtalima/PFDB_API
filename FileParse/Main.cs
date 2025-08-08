@@ -40,7 +40,7 @@ public static class ParseTesting {
     public static bool Test(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod /*= StringComparison.InvariantCultureIgnoreCase*/)
     {
         int score = 0;
-        PFDBLogger.LogInformation("\u001b[1;35mBeginning parse testing:");
+        PFDBLogger.LogInformation($"\u001b[1;35mBeginning parse testing: (parameters: acceptableSpaces: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces})");
         PFDBLogger.LogInformation("");
         if (IndexSearchSingleCharacterTest(stringComparisonMethod)) score++;
         if (IndexSearchSingleWordTest(stringComparisonMethod)) score++;
@@ -159,7 +159,7 @@ public static class ParseTesting {
         }
         catch (WordNotFoundException)
         {
-            PFDBLogger.LogError($"Whoever wrote the sample text is a moron. :(\n{sampleText}");
+            PFDBLogger.LogError($"Whoever wrote the sample text is a moron. :(\tFor your convenience, you can review the contents of the text here:\n\n{sampleText}\n");
         }
         return TestingOutput("StatisticParse match test.", status, true.ToString(), status.ToString());
 
