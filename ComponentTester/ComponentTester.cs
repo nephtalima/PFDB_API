@@ -76,14 +76,33 @@ public class ComponentTester
 	 *	and so we need to account for the very first two parameters being the main operation followed by a subcommand
 	 *	i.e. /pfdb (operation) (sub-command) [actual parameters we care about]
 	 *	then we store those into an array and return that
+	 *	the amount of arguments before [actual params] constitute the argsOffset number, which is by default 2
 	 */
-	public static List<string?> argumentFiller(string[] args, int argsOffset = 2){
 
-		List<string?> allargs = new List<string?>();
-		for(int i = argsOffset; i < args.Length; ++i){
+
+	/// <summary>
+	/// Pads argument list when unused parameters are passed.
+	/// </summary>
+	/// <param name="args">Command-line arguments.</param>
+	/// <param name="requiredNumberOfArgs">The required number of arguments for the <b>function</b>, not the command.</param>
+	/// <param name="argsOffset">The number of arguments preceding the arguments of interest.</param>
+	/// <returns>A list containing the (potentially null) strings to be passed downstream.</returns>
+	public static List<string?> argumentFiller(string[] args, int requiredNumberOfArgs, int argsOffset = 2)
+	{
+
+		List<string?> allargs = new List<string?>(requiredNumberOfArgs);
+		for (int i = argsOffset; i < args.Length; ++i)
+		{
 			allargs.Add(args[i]);
 		}
-		allargs.EnsureCapacity(args.Length - argsOffset);
+
+		while (allargs.Count < requiredNumberOfArgs)
+		{
+			allargs.Add(null);
+		}
+
+		//platio sam puno minute za ovo malo sranje...
+
 
 		return allargs;
 	}
@@ -150,7 +169,6 @@ public class ComponentTester
 
 		PFDBLogger logger = new PFDBLogger(".pfdblog");
 		
-		const int argsOffset = 2;
 		switch (operation)
 		{
 			case Operations.Help:
@@ -171,8 +189,8 @@ public class ComponentTester
 						case "all":
 							{
 								
-								List<string?> allargs = argumentFiller(args, argsOffset);
-	
+								List<string?> allargs = argumentFiller(args, requiredNumberOfArgs: 5);
+
 								int? acceptableSpaces = null;
 								int? acceptableCorruptedWordSpaces = null;
 								if(allargs[3] != null){
@@ -192,9 +210,9 @@ public class ComponentTester
 								}
 
 
-
-
 								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+
+
 								Test.TestAll(allargs[0], allargs[1], allargs[2],
 									acceptableSpaces: acceptableSpaces,
 									acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
@@ -204,28 +222,24 @@ public class ComponentTester
 						case "py":
 						case "python":
 							{
-								string?[]? allargs = {null, null, null};
-								for (int i = argsOffset; i < args.Length; i++)
-								{
-									//Console.WriteLine($"arg {i}: {args[i] ?? "was null"}");
-									allargs[i - argsOffset] = args[i];
-								}
+								List<string?> allargs = argumentFiller(args, requiredNumberOfArgs: 3);
 
 
 								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}");
+
+
 								Test.TestPython(pythonProgramPath: allargs[0], imageBasePath: allargs[1], tessbinPath: allargs[2]); 
 								break;
 							}
 						case "parse":
 							{
-								string?[]? allargs = { null, null};
-								for (int i = argsOffset; i < args.Length; i++)
-								{
-									//Console.WriteLine($"arg {i}: {args[i] ?? "was null"}");
-									allargs[i - argsOffset] = args[i];
-								}
+								
+								List<string?> allargs = argumentFiller(args, requiredNumberOfArgs: 2 );
+								
 								int? acceptableSpaces = null;
 								int? acceptableCorruptedWordSpaces = null;
+
+
 								if(allargs[0] != null){
 									acceptableSpaces = Convert.ToInt32(allargs[0]);
 									if(acceptableSpaces < 0){
@@ -241,7 +255,10 @@ public class ComponentTester
 										break;
 									} 
 								}
+								
 								//PFDBLogger.LogInformation($"acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+								
+								
 								Test.TestParse(
 									acceptableSpaces: acceptableSpaces,
 									acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
