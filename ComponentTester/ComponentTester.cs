@@ -22,6 +22,9 @@ public class ComponentTester
 	 *			(planned: SQLiteHandler)
 	 *			
 	 *	build -> builds specific versions
+	 *			(planned: SQLiteHandler)
+	 *			
+	 *	build -> builds specific versions
 	 *			(supported: existing versions)
 	 *			(plan to build all)
 	 *	
@@ -107,29 +110,10 @@ public class ComponentTester
 		return allargs;
 	}
 
-	public static void Main(string[] args)
+	public static Operations operationDecider(string command)
 	{
-
-		if (args.Length == 0)
-		{
-			displayHelp();
-			return;
-		}
-
-
-		for (int i = 0; i < args.Length; ++i)
-		{
-			Console.WriteLine($"arg{i}: {args[i]}");
-		}
-
 		Operations operation = Operations.Help;
-
-
-		Console.WriteLine(args[0]);
-		Console.WriteLine(args.Length);
-
-
-		switch (args[0].ToLowerInvariant())
+		switch (command.ToLowerInvariant())
 		{
 			case "--help":
 			case "help":
@@ -139,7 +123,7 @@ public class ComponentTester
 				}
 			case "test":
 				{
-					if (args.Length < 1 || args.Length > 9) operation = Operations.Help;
+					//if (args.Length < 1 || args.Length > 9) operation = Operations.Help;
 					operation = Operations.Test;
 					break;
 				}
@@ -164,15 +148,45 @@ public class ComponentTester
 					break;
 				}
 		}
+		return operation;
+	}
+
+
+	public static void Main(string[] args)
+	{
+
+		if (args.Length == 0)
+		{
+			displayHelp();
+			return;
+		}
+
+
+		for (int i = 0; i < args.Length; ++i)
+		{
+			Console.WriteLine($"arg{i}: {args[i]}");
+		}
+
+		Operations operation = operationDecider(args[0]);
+
+
+		Console.WriteLine(args[0]);
+		Console.WriteLine(args.Length);
+
+
+
+
+		
 
 		Console.WriteLine(operation);
 
 		PFDBLogger logger = new PFDBLogger(".pfdblog");
-		
+
 		switch (operation)
 		{
 			case Operations.Help:
 				{
+					//todo: add functionality to view the help for each command
 					displayHelp();
 					break;
 				}
@@ -183,98 +197,17 @@ public class ComponentTester
 						Test.DisplayTestHelp();
 						break;
 					}
-						
-					switch (args[1].ToLowerInvariant())
-					{
-						case "all":
-							{
-								
-								List<string?> allargs = argumentFiller(args, requiredNumberOfArgs: 5);
-
-								int? acceptableSpaces = null;
-								int? acceptableCorruptedWordSpaces = null;
-								if(allargs[3] != null){
-									acceptableSpaces = Convert.ToInt32(allargs[3]);
-									if(acceptableSpaces < 0){
-										PFDBLogger.LogError("acceptableSpaces cannot be negative. Exiting.");
-										break;
-									} 
-								}
-
-								if(allargs[4] != null){
-									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[4]);
-									if(acceptableCorruptedWordSpaces < 0){
-										PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
-										break;
-									} 
-								}
 
 
-								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
-
-
-								Test.TestAll(allargs[0], allargs[1], allargs[2],
-									acceptableSpaces: acceptableSpaces,
-									acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
-									null);
-								break;
-							}
-						case "py":
-						case "python":
-							{
-								List<string?> allargs = argumentFiller(args, requiredNumberOfArgs: 3);
-
-
-								PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}");
-
-
-								Test.TestPython(pythonProgramPath: allargs[0], imageBasePath: allargs[1], tessbinPath: allargs[2]); 
-								break;
-							}
-						case "parse":
-							{
-								
-								List<string?> allargs = argumentFiller(args, requiredNumberOfArgs: 2 );
-								
-								int? acceptableSpaces = null;
-								int? acceptableCorruptedWordSpaces = null;
-
-
-								if(allargs[0] != null){
-									acceptableSpaces = Convert.ToInt32(allargs[0]);
-									if(acceptableSpaces < 0){
-										PFDBLogger.LogError("acceptableSpaces cannot be negative. Exiting.");
-										break;
-									} 
-								}
-
-								if(allargs[1] != null){
-									acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[1]);
-									if(acceptableCorruptedWordSpaces < 0){
-										PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
-										break;
-									} 
-								}
-								
-								//PFDBLogger.LogInformation($"acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
-								
-								
-								Test.TestParse(
-									acceptableSpaces: acceptableSpaces,
-									acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
-									null);
-								break;
-							}
-						default:
-							{
-								Test.DisplayTestHelp();
-								break;
-							}
-					}
 					break;
 				}
 			case Operations.Build:
 				{
+					if (args.Length < 2)
+					{
+						//display build help
+						break;
+					}
 					break;
 				}
 			case Operations.Inventory:

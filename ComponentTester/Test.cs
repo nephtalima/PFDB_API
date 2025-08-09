@@ -1,4 +1,4 @@
-using PFDB.Parsing;
+using PFDB.Logging;
 using PFDB.ParsingUtility;
 using PFDB.PythonTesting;
 using System.Text;
@@ -16,6 +16,98 @@ namespace PFDB;
 public static class Test
 {
     //public static IEnumerable<uint> RequiredNumberOfParameters { get; } = new List<uint> { 2 };
+
+    public static void TestCommand(string[] args)
+    {
+        switch (args[1].ToLowerInvariant())
+        {
+            case "all":
+                {
+                    
+                    List<string?> allargs = ComponentTester.argumentFiller(args, requiredNumberOfArgs: 5);
+
+                    int? acceptableSpaces = null;
+                    int? acceptableCorruptedWordSpaces = null;
+                    if(allargs[3] != null){
+                        acceptableSpaces = Convert.ToInt32(allargs[3]);
+                        if(acceptableSpaces < 0){
+                            PFDBLogger.LogError("acceptableSpaces cannot be negative. Exiting.");
+                            break;
+                        } 
+                    }
+
+                    if(allargs[4] != null){
+                        acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[4]);
+                        if(acceptableCorruptedWordSpaces < 0){
+                            PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
+                            break;
+                        } 
+                    }
+
+
+                    PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+
+
+                    Test.TestAll(allargs[0], allargs[1], allargs[2],
+                        acceptableSpaces: acceptableSpaces,
+                        acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
+                        null);
+                    break;
+                }
+            case "py":
+            case "python":
+                {
+                    List<string?> allargs = ComponentTester.argumentFiller(args, requiredNumberOfArgs: 3);
+
+
+                    PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}");
+
+
+                    Test.TestPython(pythonProgramPath: allargs[0], imageBasePath: allargs[1], tessbinPath: allargs[2]); 
+                    break;
+                }
+            case "parse":
+                {
+                    
+                    List<string?> allargs = ComponentTester.argumentFiller(args, requiredNumberOfArgs: 2 );
+                    
+                    int? acceptableSpaces = null;
+                    int? acceptableCorruptedWordSpaces = null;
+
+
+                    if(allargs[0] != null){
+                        acceptableSpaces = Convert.ToInt32(allargs[0]);
+                        if(acceptableSpaces < 0){
+                            PFDBLogger.LogError("acceptableSpaces cannot be negative. Exiting.");
+                            break;
+                        } 
+                    }
+
+                    if(allargs[1] != null){
+                        acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[1]);
+                        if(acceptableCorruptedWordSpaces < 0){
+                            PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
+                            break;
+                        } 
+                    }
+                    
+                    //PFDBLogger.LogInformation($"acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+                    
+                    
+                    Test.TestParse(
+                        acceptableSpaces: acceptableSpaces,
+                        acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
+                        null);
+                    break;
+                }
+            default:
+                {
+                    Test.DisplayTestHelp();
+                    break;
+                }
+        }
+    }
+
 
     public static void TestPython(string? pythonProgramPath, string? imageBasePath, string? tessbinPath)
     {
