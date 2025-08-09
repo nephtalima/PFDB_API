@@ -45,6 +45,10 @@ public static class PythonTest
     {
         int score = 0;
         if (WeaponTable.InitializeEverything().success == false) return false;
+
+        PFDBLogger.LogInformation("");
+        PFDBLogger.LogInformation($"\u001b[1;36mStarting Python testing. (parameters: pythonProgramPath: {pythonProgramPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath})\u001b[0;0m");
+        PFDBLogger.LogInformation("");
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
         if (PythonInitExecutableTest()) score++;

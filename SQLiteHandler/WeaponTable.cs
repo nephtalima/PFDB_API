@@ -107,7 +107,7 @@ public static class WeaponTable
 	{
 		bool success = false;
 		Stopwatch stopwatch = Stopwatch.StartNew();
-		PFDBLogger.LogInformation("\u001b[1;34mStarting database initialization.");
+		PFDBLogger.LogInformation("\u001b[1;34mStarting database initialization.\u001b[0;0m");
         PFDBLogger.LogInformation("");
 
 		try
