@@ -9,6 +9,7 @@ using PFDB.PythonFactory;
 using System.Collections.Generic;
 using PFDB.PythonFactoryUtility;
 using PFDB.SQLite;
+using static PFDB.WeaponUtility.WeaponUtilityClass;
 
 /*
 Other tests: (maybe todo)
@@ -35,7 +36,15 @@ public static class PythonTest
     public static void Main()
     {
         PFDBLogger logger = new PFDBLogger(".pfdblog");
-        Test(string.Empty, string.Empty, null);
+
+        PythonTesseractExecutable tesseractExecutable = new PythonTesseractExecutable();
+        tesseractExecutable.Construct("0_2_testimage.png", Directory.GetCurrentDirectory(), new WeaponIdentification(new PhantomForcesVersion("10.1.0"), Categories.AssaultRifles, 15, 0, "AS-VAL"), WeaponType.Primary, Directory.GetCurrentDirectory());
+
+        tesseractExecutable.CheckInput();
+        IOutput output = tesseractExecutable.ReturnOutput();
+        
+        Console.WriteLine($"{output.OutputString}, {((output is Benchmark b) ? b.StopwatchNormal.ElapsedMilliseconds : "")}");
+
     }
 
     /// <summary>
@@ -114,6 +123,11 @@ public static class PythonTest
                 }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, tessbinPath);
         IPythonExecutionFactoryOutput output = factory.Start();
         Console.WriteLine(output.QueueStatusCounter.SuccessCounter);
+        PFDBLogger.LogWarning("The following files are missing:");
+		foreach (string str in output.MissingFiles)
+		{
+			PFDBLogger.LogInformation(str);
+		}
         int successes = output.QueueStatusCounter.SuccessCounter;
         return TestingOutput("Python execution factory test (queueing, checking, executing)", successes >= expectedAmount, expectedAmount.ToString(), successes.ToString());
     }
@@ -174,7 +188,7 @@ public static class PythonTest
         }
         IDictionary<PhantomForcesVersion, string> versionAndPathPairs = new Dictionary<PhantomForcesVersion, string>
         {
-            { version1001, $"{imageBasePath}{PyUtilityClass.slash}version1001{PyUtilityClass.slash}" }
+            { version1001, $"{imageBasePath}{WeaponUtilityClass.slash}version1001{WeaponUtilityClass.slash}" }
         };
 
         PythonExecutionFactory<InitExecutable> factory =
@@ -183,6 +197,12 @@ public static class PythonTest
                     {version1001, weaponNumbers}
                 }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, null);
         IPythonExecutionFactoryOutput output = factory.Start();
+
+        PFDBLogger.LogWarning("The following files are missing:");
+		foreach (string str in output.MissingFiles)
+		{
+			PFDBLogger.LogInformation(str);
+		}
         //Console.WriteLine(output.QueueStatusCounter.SuccessCounter);
         int successes = output.QueueStatusCounter.SuccessCounter;
         return TestingOutput("Python execution factory test (queueing, checking, executing)", successes >= expectedAmount, expectedAmount.ToString(), successes.ToString());
@@ -217,17 +237,17 @@ public static class PythonTest
     {
         IPythonExecutor executor = new PythonExecutor(OutputDestination.File);
         executor.Execute(null);
-        bool outputfolderexists = Directory.Exists(Directory.GetCurrentDirectory() + PyUtilityClass.slash + PythonExecutor.OutputFolderName + $"{PyUtilityClass.slash}0");
-        bool logfolderexists = Directory.Exists(Directory.GetCurrentDirectory() + PyUtilityClass.slash + PythonExecutor.LogFolderName + $"{PyUtilityClass.slash}0");
-        bool outputfilecreated = File.Exists(Directory.GetCurrentDirectory() + PyUtilityClass.slash + PythonExecutor.OutputFolderName + $"{PyUtilityClass.slash}0{PyUtilityClass.slash}.pfdb");
-        bool logfilecreated = File.Exists(Directory.GetCurrentDirectory() + PyUtilityClass.slash + PythonExecutor.LogFolderName + $"{PyUtilityClass.slash}0{PyUtilityClass.slash}.pfdblog");
+        bool outputfolderexists = Directory.Exists(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.OutputFolderName + $"{WeaponUtilityClass.slash}0");
+        bool logfolderexists = Directory.Exists(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.LogFolderName + $"{WeaponUtilityClass.slash}0");
+        bool outputfilecreated = File.Exists(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.OutputFolderName + $"{WeaponUtilityClass.slash}0{WeaponUtilityClass.slash}.pfdb");
+        bool logfilecreated = File.Exists(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.LogFolderName + $"{WeaponUtilityClass.slash}0{WeaponUtilityClass.slash}.pfdblog");
         PFDBLogger.LogInformation($"Did it make an output directory? {outputfolderexists}");
         PFDBLogger.LogInformation($"Did it make a log directory? {logfolderexists}");
         PFDBLogger.LogInformation($"Did it make an output file? {outputfilecreated}");
         PFDBLogger.LogInformation($"Did it make a log file? {logfilecreated}");
         //Console.ReadLine();
-        if (logfolderexists) Directory.Delete(Directory.GetCurrentDirectory() + PyUtilityClass.slash + PythonExecutor.LogFolderName + PyUtilityClass.slash + "0", true);
-        if (outputfolderexists) Directory.Delete(Directory.GetCurrentDirectory() + PyUtilityClass.slash + PythonExecutor.OutputFolderName + PyUtilityClass.slash + "/0", true);
+        if (logfolderexists) Directory.Delete(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.LogFolderName + WeaponUtilityClass.slash + "0", true);
+        if (outputfolderexists) Directory.Delete(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.OutputFolderName + WeaponUtilityClass.slash + "/0", true);
         PFDBLogger.LogInformation("Deleted output and log folders (if they even existed)");
         return TestingOutput("Log and output folders + files creation", logfolderexists && outputfolderexists && logfilecreated && outputfilecreated, "True", (logfolderexists && outputfolderexists).ToString());
     }
@@ -252,7 +272,7 @@ public static class PythonTest
         PFDBLogger.LogInformation("Done executing.");
 
         int score = 0;
-        bool fileExists = File.Exists($"{Directory.GetCurrentDirectory()}{PyUtilityClass.slash}{PythonExecutor.OutputFolderName}{PyUtilityClass.slash}1010/{fileName}.pfdb");
+        bool fileExists = File.Exists($"{Directory.GetCurrentDirectory()}{WeaponUtilityClass.slash}{PythonExecutor.OutputFolderName}{WeaponUtilityClass.slash}1010/{fileName}.pfdb");
         if (TestingOutput($"File {fileName}.pfdb exists", fileExists, "True", fileExists.ToString()))
         {
             score++;

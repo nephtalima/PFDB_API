@@ -16,6 +16,7 @@ using PFDB.SQLite;
 using PFDB.PythonExecutionUtility;
 using PFDB.PythonFactoryUtility;
 using System.IO;
+using static PFDB.WeaponUtility.WeaponUtilityClass;
 
 namespace PFDB.PythonFactory;
 
@@ -65,9 +66,9 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 		for (int index = 0; index < version.MultipleScreenshotsCheck(); index++)
 		{
 			//add trailing slash
-			if (imagePath.EndsWith(PyUtilityClass.slash) == false)
+			if (imagePath.EndsWith(slash) == false)
 			{
-				imagePath += PyUtilityClass.slash;
+				imagePath += slash;
 			}
 
 			string temp = "";

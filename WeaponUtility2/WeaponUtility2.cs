@@ -308,6 +308,12 @@ public static class WeaponUtilityClass
 		return weaponType;
 	}
 
+
+	/// <summary>
+	/// Changes slash based on if the operating system is Linux or Windows.
+	/// </summary>
+	public static char slash = Directory.Exists("/usr/bin") ? '/' : '\\';
+
 	/// <summary>
 	/// Gets the category type of the supplied category number.
 	/// </summary>

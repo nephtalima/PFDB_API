@@ -5,6 +5,7 @@ using System.Text;
 using PFDB.Logging;
 using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
+using static PFDB.WeaponUtility.WeaponUtilityClass;
 
 
 namespace PFDB.PythonExecution;
@@ -89,18 +90,18 @@ public class PythonTesseractExecutable : IPythonExecutable
 		_tessbinPath = null;
 		if (_tessbinPath != null)
 		{
-			if (_tessbinPath.EndsWith(PyUtilityClass.slash) == false)
+			if (_tessbinPath.EndsWith(slash) == false)
 			{
-				_tessbinPath += PyUtilityClass.slash;
+				_tessbinPath += slash;
 			}
 		}
-		if (programDirectory.EndsWith(PyUtilityClass.slash) == false)
+		if (programDirectory.EndsWith(slash) == false)
 		{
-			programDirectory += PyUtilityClass.slash;
+			programDirectory += slash;
 		}
-		if (fileDirectory.EndsWith(PyUtilityClass.slash) == false)
+		if (fileDirectory.EndsWith(slash) == false)
 		{
-			fileDirectory += PyUtilityClass.slash;
+			fileDirectory += slash;
 		}
 		_fileDirectory = fileDirectory;
 		_WID = weaponID;
@@ -129,18 +130,18 @@ public class PythonTesseractExecutable : IPythonExecutable
 		_isDefaultConversion = isDefaultConversion;
 		if (_tessbinPath != null)
 		{
-			if (_tessbinPath.EndsWith(PyUtilityClass.slash) == false)
+			if (_tessbinPath.EndsWith(slash) == false)
 			{
-				_tessbinPath += PyUtilityClass.slash;
+				_tessbinPath += slash;
 			}
 		}
-		if (programDirectory.EndsWith(PyUtilityClass.slash) == false)
+		if (programDirectory.EndsWith(slash) == false)
 		{
-			programDirectory += PyUtilityClass.slash;
+			programDirectory += slash;
 		}
-		if (fileDirectory.EndsWith(PyUtilityClass.slash) == false)
+		if (fileDirectory.EndsWith(slash) == false)
 		{
-			fileDirectory += PyUtilityClass.slash;
+			fileDirectory += slash;
 		}
 		_fileDirectory = fileDirectory;
 		_WID = weaponID;
@@ -189,18 +190,18 @@ public class PythonTesseractExecutable : IPythonExecutable
 		}
 		if (TessbinPath == null)
 		{
-			if (!Directory.Exists($"{Directory.GetCurrentDirectory()}{PyUtilityClass.slash}tessbin{PyUtilityClass.slash}"))
+			if (!Directory.Exists($"{Directory.GetCurrentDirectory()}{slash}tessbin{slash}"))
 			{
 				//this shouldn't be logged, the factory ideally should catch and log it
-				aggregateException.exceptions.Add(new DirectoryNotFoundException($"The tessbin path specified at {Directory.GetCurrentDirectory()}{PyUtilityClass.slash}tessbin{PyUtilityClass.slash} does not exist. Ensure that the directory exists, then try again."));
+				aggregateException.exceptions.Add(new DirectoryNotFoundException($"The tessbin path specified at {Directory.GetCurrentDirectory()}{slash}tessbin{slash} does not exist. Ensure that the directory exists, then try again."));
 			}
 		}
 		else
 		{
-			if (!Directory.Exists(TessbinPath + $"tessbin{PyUtilityClass.slash}"))
+			if (!Directory.Exists(TessbinPath + $"tessbin{slash}"))
 			{
 				//this shouldn't be logged, the factory ideally should catch and log it
-				aggregateException.exceptions.Add(new DirectoryNotFoundException($"The tessbin path specified at {TessbinPath}tessbin{PyUtilityClass.slash} does not exist. Ensure that the directory exists, then try again."));
+				aggregateException.exceptions.Add(new DirectoryNotFoundException($"The tessbin path specified at {TessbinPath}tessbin{slash} does not exist. Ensure that the directory exists, then try again."));
 			}
 		}
 		if ((File.Exists(ProgramDirectory + "impa.exe") == false && _isWindows) || (File.Exists(ProgramDirectory + "impa") == false && _isLinux))
