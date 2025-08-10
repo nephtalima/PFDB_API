@@ -24,7 +24,7 @@ public static class Test
             case "all":
                 {
                     
-                    List<string?> allargs = ComponentTester.argumentFiller(args, requiredNumberOfArgs: 5);
+                    List<string?> allargs = ComponentTester.ArgumentFiller(args, requiredNumberOfArgs: 5);
 
                     int? acceptableSpaces = null;
                     int? acceptableCorruptedWordSpaces = null;
@@ -57,7 +57,7 @@ public static class Test
             case "py":
             case "python":
                 {
-                    List<string?> allargs = ComponentTester.argumentFiller(args, requiredNumberOfArgs: 3);
+                    List<string?> allargs = ComponentTester.ArgumentFiller(args, requiredNumberOfArgs: 3);
 
 
                     PFDBLogger.LogInformation($"pythonProgramPath: {allargs[0]}, imageBasePath: {allargs[1]}, tessbinPath: {allargs[2]}");
@@ -69,7 +69,7 @@ public static class Test
             case "parse":
                 {
                     
-                    List<string?> allargs = ComponentTester.argumentFiller(args, requiredNumberOfArgs: 2 );
+                    List<string?> allargs = ComponentTester.ArgumentFiller(args, requiredNumberOfArgs: 2 );
                     
                     int? acceptableSpaces = null;
                     int? acceptableCorruptedWordSpaces = null;

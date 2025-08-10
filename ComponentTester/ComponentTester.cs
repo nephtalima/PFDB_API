@@ -48,7 +48,7 @@ public class ComponentTester
 	}
 
 	// displays help
-	public static void displayHelp()
+	public static void DisplayHelp()
 	{
 		//ConsoleColor initial = Console.BackgroundColor;
 		//Console.BackgroundColor = ConsoleColor.DarkRed;
@@ -90,7 +90,7 @@ public class ComponentTester
 	/// <param name="requiredNumberOfArgs">The required number of arguments for the <b>function</b>, not the command.</param>
 	/// <param name="argsOffset">The number of arguments preceding the arguments of interest.</param>
 	/// <returns>A list containing the (potentially null) strings to be passed downstream.</returns>
-	public static List<string?> argumentFiller(string[] args, int requiredNumberOfArgs, int argsOffset = 2)
+	public static List<string?> ArgumentFiller(string[] args, int requiredNumberOfArgs, int argsOffset = 2)
 	{
 
 		List<string?> allargs = new List<string?>(requiredNumberOfArgs);
@@ -110,7 +110,7 @@ public class ComponentTester
 		return allargs;
 	}
 
-	public static Operations operationDecider(string command)
+	public static Operations OperationDecider(string command)
 	{
 		Operations operation = Operations.Help;
 		switch (command.ToLowerInvariant())
@@ -157,7 +157,7 @@ public class ComponentTester
 
 		if (args.Length == 0)
 		{
-			displayHelp();
+			DisplayHelp();
 			return;
 		}
 
@@ -167,7 +167,7 @@ public class ComponentTester
 			Console.WriteLine($"arg{i}: {args[i]}");
 		}
 
-		Operations operation = operationDecider(args[0]);
+		Operations operation = OperationDecider(args[0]);
 
 
 		Console.WriteLine(args[0]);
@@ -187,7 +187,7 @@ public class ComponentTester
 			case Operations.Help:
 				{
 					//todo: add functionality to view the help for each command
-					displayHelp();
+					DisplayHelp();
 					break;
 				}
 			case Operations.Test:
@@ -221,138 +221,18 @@ public class ComponentTester
 
 		}
 
-		/*
-		if(test){
-			int score = 0;
-			if(ParseTesting.Test())score++;
-
-				//pythonProgramPath = args[1]
-				//imageBasePath = args[2]
-
-			if (PythonTest.Test(args[1], args[2], null)) score++;
-			if(score >= 2){
-				Console.WriteLine($"{Environment.NewLine}{Environment.NewLine}");
-				PythonTest.TestingOutput("All tests", score >= 2, "2", 2.ToString());
-				PFDBLogger.LogInformation("Tests have passed successfully!");
-				Console.WriteLine($"{Environment.NewLine}{Environment.NewLine}");
-			}
-		}
-
-		if(build){
-			Console.WriteLine("building");
-			//buildAllVersions()
-			if(args.Length == 3){
-				//full build
-
-				//pythonProgramPath = args[1]
-				//imageBasePath = args[2]
-				
-				buildAllVersions(args[2], args[1], null);
-			}else if(args.Length == 4){
-				//specific version build 
-
-				//pythonProgramPath = args[1]
-				//imageBasePath = args[2]
-				
-				buildSpecificVersion(args[2], args[1], null, new PhantomForcesVersion(args[3]));
-			}else if(args.Length > 4){
-
-			}
-			
-		}
-		*/
 		//WeaponTable.InitializeEverything();
 		Log.Logger.Information("Application end. Logging has finished.");
 		return;
 	}
 
-	public static void inventory()
+	public static void Inventory()
 	{
 		//list all weapons from database
 		//and sees if they exist
 	}
 
 
-	public static void buildAllVersions(string imageBasePath, string pythonProgramPath, string? tessbinPath)
-	{
-		if (Directory.Exists(imageBasePath) == false)
-		{
-			PFDBLogger.LogError($"Directory path was not found: {imageBasePath}");
-			return;
-			//throw new DirectoryNotFoundException($"Directory path was not found: {imageBasePath}");
-		}
-		IDictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>> list = new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>>();
-		IDictionary<PhantomForcesVersion, string> versionAndPathPairs = new Dictionary<PhantomForcesVersion, string>();
-
-		foreach (PhantomForcesVersion version in WeaponTable.ListOfVersions)
-		{
-			//IDictionary<Categories, int> weaponCounts = WeaponTable.WeaponCounts[version]; //maximum number of weapons in the category
-			Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
-			foreach (Categories category in WeaponTable.WeaponCounts[version].Keys)
-			{
-				List<int> tempList = new List<int>();
-				for (int i = 0; i < WeaponTable.WeaponCounts[version][category]; ++i)
-				{
-					tempList.Add(i);
-				}
-				weaponNumbers.Add(category, tempList);
-			}
-			list.Add(version, weaponNumbers);
-			versionAndPathPairs.Add(version, $"{imageBasePath}{PyUtilityClass.slash}version{version.VersionNumber}{PyUtilityClass.slash}");
-		}
-		PythonExecutionFactory<PythonTesseractExecutable> factory = new PythonExecutionFactory<PythonTesseractExecutable>(list, versionAndPathPairs, pythonProgramPath, OutputDestination.Console | OutputDestination.File, tessbinPath);
-		IPythonExecutionFactoryOutput factoryOutput = factory.Start();
-		PFDBLogger.LogWarning("The following files are missing:");
-		foreach (string str in factoryOutput.MissingFiles)
-		{
-			Console.WriteLine(str);
-		}
-
-	}
-
-	public static void buildSpecificVersion(string imageBasePath, string pythonProgramPath, string? tessbinPath, PhantomForcesVersion version)
-	{
-		//verify path
-		//string sourcePath = "/mnt/bulkdata/Programming/PFDB/PFDB_API/textOutputsByVersion/version1001";
-		//PhantomForcesVersion version = new PhantomForcesVersion(10,0,1);
-
-
-		if (Directory.Exists(imageBasePath) == false)
-		{
-			PFDBLogger.LogError($"Directory path was not found: {imageBasePath}");
-			return;
-			//throw new DirectoryNotFoundException($"Directory path was not found: {imageBasePath}");
-		}
-
-
-		//IDictionary<Categories, int> weaponCounts = WeaponTable.WeaponCounts[version]; //maximum number of weapons in the category
-		Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
-		foreach (Categories category in WeaponTable.WeaponCounts[version].Keys)
-		{
-			List<int> tempList = new List<int>();
-			for (int i = 0; i < WeaponTable.WeaponCounts[version][category]; ++i)
-			{
-				tempList.Add(i);
-			}
-			weaponNumbers.Add(category, tempList);
-		}
-		IDictionary<PhantomForcesVersion, string> versionAndPathPairs = new Dictionary<PhantomForcesVersion, string>
-		{
-			{ version, $"{imageBasePath}{PyUtilityClass.slash}version{version.VersionNumber}{PyUtilityClass.slash}" }
-		};
-		PythonExecutionFactory<PythonTesseractExecutable> factory =
-		new PythonExecutionFactory<PythonTesseractExecutable>(new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>> { { version, weaponNumbers } }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console | OutputDestination.File, tessbinPath);
-		IPythonExecutionFactoryOutput factoryOutput = factory.Start();
-		PFDBLogger.LogWarning("The following files are missing:");
-		foreach (string str in factoryOutput.MissingFiles)
-		{
-			Console.WriteLine(str);
-		}
-
-
-		//verify number of images
-
-	}
 }
 
 /*
