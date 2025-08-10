@@ -67,10 +67,10 @@ class ImageParser:
 		print("Version: " + version)
 		crops = self.getListOfCropsFromImage(imagePath,weaponType, version, rank)
 		for crop in crops:
-			f = open("file.txt","a")
 			print("=" * 5, crop[0], "=" * 5)
 			data = self.getTextFromImage(crop[1],crop[0], version)
 			print(data + "\n")
+			f = open("file.txt","a")
 			f.write(data + "\n")
 			f.close()
 	
