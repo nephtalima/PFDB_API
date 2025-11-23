@@ -17,6 +17,7 @@ using PFDB.PythonExecutionUtility;
 using PFDB.PythonFactoryUtility;
 using System.IO;
 using static PFDB.WeaponUtility.WeaponUtilityClass;
+using System.Threading.Tasks;
 
 namespace PFDB.PythonFactory;
 
@@ -371,11 +372,18 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 		ThreadPool.SetMinThreads(_coreCount, _coreCount);
 		ThreadPool.SetMaxThreads(_coreCount, _coreCount);
 
-		List<List<IPythonExecutor>> listForQueue = new List<List<IPythonExecutor>>();
+
+
+
+		List<List<IPythonExecutor>> listOfSmallerQueues = new List<List<IPythonExecutor>>();
 		if (_queue.Count < _coreCount) {
 			//looks strange, but this code duplicates the list without affecting the actual _queue list
-			listForQueue.Add(new List<IPythonExecutor>(_queue));
+			listOfSmallerQueues.Add(new List<IPythonExecutor>(_queue));
 		}
+
+
+
+
 		int i;
 		// allocates items to a temporary queue buffer that restricts the number of parallel threads to be within the core count of the computer.
 		for (i = 0; i < _queue.Count / _coreCount; i++)
@@ -386,8 +394,8 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 			{
 				temp.Add(_queue[i * _coreCount + j]);
 			}
-			//listForQueue.Add(temp.ToList());
-			listForQueue.Add([.. temp]);
+			//listOfSmallerQueues.Add(temp.ToList());
+			listOfSmallerQueues.Add([.. temp]);
 		}
 		if (_queue.Count % _coreCount != 0)
 		{
@@ -396,32 +404,97 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 			{
 				temp1.Add(_queue[j]);
 			}
-			listForQueue.Add(temp1);
+			listOfSmallerQueues.Add(temp1);
 		}
 
+		TimeSpan totalParallelTimeElapsedDateTime = new TimeSpan(0);
+		long totalParallelTimeElapsedInMilliseconds = 0;
 		Stopwatch stopwatch = new Stopwatch();
 		stopwatch.Start();
 		DateTime start = DateTime.Now;
-		TimeSpan totalParallelTimeElapsedDateTime = new TimeSpan(0);
-		long totalParallelTimeElapsedInMilliseconds = 0;
+
+		List<IOutput> outputs = new List<IOutput>();
+		foreach (List<IPythonExecutor> smallList in listOfSmallerQueues)
+		{
+			Task[] tasks = new Task[smallList.Count];
+
+			for (int k = 0; k < smallList.Count; ++k)
+			{
+				/*
+				tasks[k] = Task.Factory.StartNew<IOutput>(() => {
+					smallList[k].Execute(null); return smallList[k].Output;
+				});
+				*/
+				if(tasks[k] == null)Console.WriteLine($"tasks[{k}] was null");
 
 
-		for (int currentListIndexInBigList = 0; currentListIndexInBigList < listForQueue.Count; ++currentListIndexInBigList)
+				
+				try
+				{
+					smallList[k].Execute(null);
+					
+					
+
+
+				/*
+					Task.Factory.ContinueWhenAll(tasks,
+						(_) =>
+						{
+							foreach (IPythonExecutor executor in smallList)
+							{
+								IOutput output = executor.Output;
+								if (output is Benchmark benchmark)
+								{
+									ExecutionStatus.SuccessCounter++;
+									totalParallelTimeElapsedDateTime += benchmark.StopwatchDateTime;
+									totalParallelTimeElapsedInMilliseconds += benchmark.StopwatchNormal.ElapsedMilliseconds;
+								}
+								else if (executor.Output is FailedPythonOutput failedOutput)
+								{
+									ExecutionStatus.FailCounter++;
+									PFDBLogger.LogError($"Execution failed: Execution of the individual Python script failed", parameter: failedOutput.OutputString);
+								}
+								else
+								{
+									ExecutionStatus.SuccessCounter++;
+
+								}
+								outputs.Add(executor.Output);
+							}
+						}
+					);
+
+				*/
+				}
+				catch (Exception e)
+				{
+					PFDBLogger.LogWarning($"Execption raised when trying to construct factory: {e}");
+				}
+
+			} 
+		}
+
+
+
+		/*
+		//the following code needs to be improved, i'm sorry, but this is shit
+
+		for (int currentListIndexInBigList = 0; currentListIndexInBigList < listOfSmallerQueues.Count; ++currentListIndexInBigList)
 		{
 			//Console.WriteLine($"Thread Count: {ThreadPool.ThreadCount}, Completed Threads: {ThreadPool.CompletedWorkItemCount}, Pending Threads: {ThreadPool.PendingWorkItemCount}");
 
-			int size = listForQueue[currentListIndexInBigList].Count;
+			int size = listOfSmallerQueues[currentListIndexInBigList].Count;
 			ManualResetEvent[] manualEvents = new ManualResetEvent[size];
 			for (int smallListIndex = 0; smallListIndex < size; smallListIndex++)
 			{
-				if (listForQueue[currentListIndexInBigList][smallListIndex] is IAwaitable awaitable)
+				if (listOfSmallerQueues[currentListIndexInBigList][smallListIndex] is IAwaitable awaitable)
 				{
 					manualEvents[smallListIndex] = awaitable.ManualEvent;
 				}
 				try
 				{
 					//queues the job into the threadpool
-					ThreadPool.QueueUserWorkItem(new WaitCallback(listForQueue[currentListIndexInBigList][smallListIndex].Execute));
+					ThreadPool.QueueUserWorkItem(new WaitCallback(listOfSmallerQueues[currentListIndexInBigList][smallListIndex].Execute));
 					QueueStatus.SuccessCounter++;
 				}
 				catch (NotSupportedException e)
@@ -436,7 +509,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 			{
 				PFDBLogger.LogInformation("Current parallel asynchronous awaiter has finished.");
 				//Console.WriteLine("success, all have been completed!");
-				foreach (IPythonExecutor executor in listForQueue[currentListIndexInBigList])
+				foreach (IPythonExecutor executor in listOfSmallerQueues[currentListIndexInBigList])
 				{
 					if (executor.Output is Benchmark benchmark)
 					{
@@ -444,7 +517,8 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 						totalParallelTimeElapsedDateTime += benchmark.StopwatchDateTime;
 						totalParallelTimeElapsedInMilliseconds += benchmark.StopwatchNormal.ElapsedMilliseconds;
 
-					} else if (executor.Output is FailedPythonOutput failedOutput)
+					}
+					else if (executor.Output is FailedPythonOutput failedOutput)
 					{
 						ExecutionStatus.FailCounter++;
 						PFDBLogger.LogError($"Execution failed: Execution of the individual Python script failed", parameter: failedOutput.OutputString);
@@ -466,12 +540,12 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 			/*foreach(ManualResetEvent u in manualEvents)
 			{
 				u.Dispose();
-			}*/
+			}*
 
 
-			PFDBLogger.LogInformation($"Thread Count: {ThreadPool.ThreadCount}, Completed Threads: {ThreadPool.CompletedWorkItemCount}, Pending Threads: {ThreadPool.PendingWorkItemCount} {Environment.NewLine} Completed/Total Parallel Jobs: {currentListIndexInBigList + 1} / {listForQueue.Count}");
+			PFDBLogger.LogInformation($"Thread Count: {ThreadPool.ThreadCount}, Completed Threads: {ThreadPool.CompletedWorkItemCount}, Pending Threads: {ThreadPool.PendingWorkItemCount} {Environment.NewLine} Completed/Total Parallel Jobs: {currentListIndexInBigList + 1} / {listOfSmallerQueues.Count}");
 
-		}
+		}*/
 		DateTime end = DateTime.Now;
 		stopwatch.Stop();
 		_factoryOutput = new PythonExecutionFactoryOutput(_queue, _isDefaultConversion, CheckStatus, QueueStatus, ExecutionStatus, totalParallelTimeElapsedDateTime, totalParallelTimeElapsedInMilliseconds, end - start, stopwatch.ElapsedMilliseconds, missingFiles);

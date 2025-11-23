@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using PFDB.PythonFactoryUtility;
 using PFDB.SQLite;
 using static PFDB.WeaponUtility.WeaponUtilityClass;
+using System.Threading.Tasks;
 
 /*
 Other tests: (maybe todo)
 tessbin path not found
 
 */
+
 
 
 namespace PFDB.PythonTesting;
@@ -37,6 +39,7 @@ public static class PythonTest
     {
         PFDBLogger logger = new PFDBLogger(".pfdblog");
 
+        /*
         PythonTesseractExecutable tesseractExecutable = new PythonTesseractExecutable();
         tesseractExecutable.Construct("0_2_testimage.png", Directory.GetCurrentDirectory(), new WeaponIdentification(new PhantomForcesVersion("10.1.0"), Categories.AssaultRifles, 15, 0, "AS-VAL"), WeaponType.Primary, Directory.GetCurrentDirectory());
 
@@ -44,7 +47,7 @@ public static class PythonTest
         IOutput output = tesseractExecutable.ReturnOutput();
         
         Console.WriteLine($"{output.OutputString}, {((output is Benchmark b) ? b.StopwatchNormal.ElapsedMilliseconds : "")}");
-
+        */
     }
 
     /// <summary>

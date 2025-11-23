@@ -198,6 +198,8 @@ public class ComponentTester
 						break;
 					}
 
+					Test.TestCommand(args);
+
 
 					break;
 				}
