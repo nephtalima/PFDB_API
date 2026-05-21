@@ -75,6 +75,15 @@ public class WeaponIdentification
 	/// <param name="weaponName">Optional weapon name.</param>
 	public WeaponIdentification(long integerIdentification, string weaponName = "")
 	{
+
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(integerIdentification), integerIdentification},
+			{nameof(weaponName), weaponName}
+		});
+
+
+		PFDBLogger.LogDebug($"Constructing {nameof(WeaponIdentification)} with arguments: '{nameof(integerIdentification)}': \"{integerIdentification}\", '{nameof(weaponName)}': \"{weaponName}\".");
 		ReadOnlySpan<char> idcode = integerIdentification.ToString();
 		const int dummySpace = 1;
 		ReadOnlySpan<char> version = idcode.Slice(dummySpace, _totalVersionSpace);
@@ -104,6 +113,14 @@ public class WeaponIdentification
 	/// <exception cref="ArgumentException"></exception>
 	public WeaponIdentification(PhantomForcesVersion version, Categories category, int rank, int rankTieBreaker, string weaponName = "")
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(version), version},
+			{nameof(category), category},
+			{nameof(rank), rank},
+			{nameof(rankTieBreaker), rankTieBreaker},
+			{nameof(weaponName), weaponName}
+		});
+
 		if (rank > 10001)
 		{
 			PFDBLogger.LogFatal("Cannot instantiate WeaponIdentification with a rank number greater than 10 001.", parameter: rank);

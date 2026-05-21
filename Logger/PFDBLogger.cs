@@ -207,5 +207,30 @@ public class PFDBLogger
 
 		Log.Fatal(stringBuilder.ToString(), parameter);
 	}
+
+	
+	public static void LogArguments(IDictionary<string, object?> arguments, [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string caller = "", params object?[]? parameter){
+
+		if (caller is null)
+		{
+			throw new ArgumentNullException(nameof(caller));
+		}
+		if (callerFilePath is null)
+		{
+			throw new ArgumentNullException(nameof(callerFilePath));
+		}
+
+		Assembly invokingAssembly = Assembly.GetCallingAssembly();
+		var mth = new StackTrace().GetFrame(1)?.GetMethod();
+		var cls = mth?.ReflectedType?.Name;
+
+		StringBuilder stringBuilder = new StringBuilder();
+		foreach(KeyValuePair<string, object?> kvp in arguments){
+			stringBuilder.Append($"'{kvp.Key}':\"{kvp.Value ?? "<null>"}\"");
+		}
+
+		Log.Information($"Invocation method '{invokingAssembly.GetName().Name}.{cls}.{caller}' with arguments {stringBuilder.ToString()}. File: {callerFilePath} InvocationLine#: {callerLineNumber}", parameter);
+	}
+
 }
 

@@ -179,6 +179,11 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	/// <param name="revision">Patch/Revision version of Phantom Forces</param>
 	public PhantomForcesVersion(int majorVersion, int minorVersion, int revision)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(majorVersion), majorVersion},
+			{nameof(minorVersion), minorVersion},
+			{nameof(revision), revision}
+		});
 		_versionString = $"{majorVersion}.{minorVersion}.{revision}";
 	}
 
@@ -190,7 +195,10 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	{
 		//alternate: ^(\d+\.?\d+\.?\d+)(\D+)
 		//matches "1010" as well, but can also match "10.10" :C
-
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(versionString), versionString}
+		});
 		Regex regexpart1 = new Regex(@"^(\d+\.\d+\.\d+)(\D+)$");
 		Match matches = regexpart1.Match(versionString);
 		if (matches.Groups.Count > 1)
@@ -222,6 +230,7 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 				throw new ArgumentException("invalid version");
 			}
 		}
+		PFDBLogger.LogDebug($"Constructed {nameof(PhantomForcesVersion)} object. Version string: \"{_versionString}\"");
 	}
 
 	/// <summary>
@@ -229,7 +238,6 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	/// </summary>
 	/// <param name="obj">The specified object to compare.</param>
 	/// <returns>Whether the specified objest is equal to the current object.</returns>
-	/// <exception cref="NotImplementedException"></exception>
 	public override bool Equals(object? obj)
 	{
 		if (obj != null)
@@ -249,6 +257,15 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	public override int GetHashCode()
 	{
 		return VersionNumber;
+	}
+
+	/// <summary>
+	/// Returns the version string of the Phantom Forces version.
+	/// </summary>
+	/// <returns>The version string of the Phantom Forces version.</returns>
+	public override string ToString()
+	{
+		return _versionString;
 	}
 
 	/// <inheritdoc/>
