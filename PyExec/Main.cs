@@ -11,6 +11,7 @@ using PFDB.PythonFactoryUtility;
 using PFDB.SQLite;
 using static PFDB.WeaponUtility.WeaponUtilityClass;
 using System.Threading.Tasks;
+using System.Linq;
 
 /*
 Other tests: (maybe todo)
@@ -126,10 +127,14 @@ public static class PythonTest
                 }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, tessbinPath);
         IPythonExecutionFactoryOutput output = factory.Start();
         Console.WriteLine(output.QueueStatusCounter.SuccessCounter);
-        PFDBLogger.LogWarning("The following files are missing:");
-		foreach (string str in output.MissingFiles)
+        
+		if (output.MissingFiles.Count() > 0)
 		{
-			PFDBLogger.LogInformation(str);
+			PFDBLogger.LogWarning("The following files are missing:");
+			foreach (string str in output.MissingFiles)
+			{
+				PFDBLogger.LogInformation(str);
+			}
 		}
         int successes = output.QueueStatusCounter.SuccessCounter;
         return TestingOutput("Python execution factory test (queueing, checking, executing)", successes >= expectedAmount, expectedAmount.ToString(), successes.ToString());
@@ -201,13 +206,16 @@ public static class PythonTest
                 }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, null);
         IPythonExecutionFactoryOutput output = factory.Start();
 
-        PFDBLogger.LogWarning("The following files are missing:");
-		foreach (string str in output.MissingFiles)
+		if (output.MissingFiles.Count() > 0)
 		{
-			PFDBLogger.LogInformation(str);
+			PFDBLogger.LogWarning("The following files are missing:");
+			foreach (string str in output.MissingFiles)
+			{
+				PFDBLogger.LogInformation(str);
+			}
 		}
-        //Console.WriteLine(output.QueueStatusCounter.SuccessCounter);
-        int successes = output.QueueStatusCounter.SuccessCounter;
+		//Console.WriteLine(output.QueueStatusCounter.SuccessCounter);
+		int successes = output.QueueStatusCounter.SuccessCounter;
         return TestingOutput("Python execution factory test (queueing, checking, executing)", successes >= expectedAmount, expectedAmount.ToString(), successes.ToString());
     }
 
