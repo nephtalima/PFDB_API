@@ -38,6 +38,8 @@ public static class PythonTest
     /// </summary>
     public static void Main()
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         PFDBLogger logger = new PFDBLogger(".pfdblog");
 
         /*
@@ -56,6 +58,11 @@ public static class PythonTest
     /// </summary>
     public static bool Test(string pythonProgramPath, string imageBasePath, string? tessbinPath)
     {
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(imageBasePath), imageBasePath},
+            {nameof(tessbinPath), tessbinPath}
+		});
         int score = 0;
         if (WeaponTable.InitializeEverything().success == false) return false;
 
@@ -98,6 +105,11 @@ public static class PythonTest
     /// <returns>Whether this tests passes.</returns>
     public static bool PythonExecutionFactoryTesseractTest(string pythonProgramPath, string imageBasePath, string? tessbinPath)
     {
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(imageBasePath), imageBasePath},
+            {nameof(tessbinPath), tessbinPath}
+		});
         //string path = Path;
 
         Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
@@ -147,6 +159,11 @@ public static class PythonTest
     /// <returns>Whether this tests passes.</returns>
     public static bool PythonExecutionFactoryEmptyTest(string pythonProgramPath, string imageBasePath, string? tessbinPath)
     {
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(imageBasePath), imageBasePath},
+            {nameof(tessbinPath), tessbinPath}
+		});
         Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
         PhantomForcesVersion version1001 = new PhantomForcesVersion("10.0.1");
 
@@ -171,6 +188,10 @@ public static class PythonTest
     /// <returns>Whether this tests passes.</returns>
     public static bool PythonExecutionFactoryMockedTest(string pythonProgramPath, string imageBasePath)
     {
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(imageBasePath), imageBasePath}
+		});
         //string path = Path;
 
         Dictionary<Categories, List<int>> weaponNumbers = new Dictionary<Categories, List<int>>();
@@ -225,6 +246,8 @@ public static class PythonTest
     /// <returns>Whether this test passes.</returns>
     public static bool PythonInitExecutableTest()
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         IPythonExecutable executable = new InitExecutable();
         bool pass = executable.ReturnOutput().OutputString == "init object";
         return TestingOutput("Init Executable detection test", pass, "True", pass.ToString());
@@ -235,6 +258,8 @@ public static class PythonTest
     /// </summary>
     public static void PythonExecutorInitExecutableConsoleTest()
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         IPythonExecutor executor = new PythonExecutor(OutputDestination.Console);
         PFDBLogger.LogInformation("Below this message there should be \"init object\".");
         executor.Execute(null);
@@ -246,6 +271,8 @@ public static class PythonTest
     /// <returns>Whether this test passes.</returns>
     public static bool PythonExecutorInitExecutableFileTest()
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         IPythonExecutor executor = new PythonExecutor(OutputDestination.File);
         executor.Execute(null);
         bool outputfolderexists = Directory.Exists(Directory.GetCurrentDirectory() + WeaponUtilityClass.slash + PythonExecutor.OutputFolderName + $"{WeaponUtilityClass.slash}0");
@@ -269,6 +296,10 @@ public static class PythonTest
     /// <returns>Whether this test passes.</returns>
     public static bool PythonTesseractExecutableTest(string? tessbinPath)
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(tessbinPath), tessbinPath}
+		});
         string fileName = "0_2_testimage.png";
 
         IPythonExecutor executor = new PythonExecutor(OutputDestination.File);
@@ -317,6 +348,14 @@ public static class PythonTest
     /// <returns>Whether the test passed or failed (equivalent to the value of "pass".)</returns>
     public static bool TestingOutput(string testName, bool pass, string expectedOutput, string actualOutput, [CallerMemberName] string caller = "")
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(testName), testName},
+            {nameof(pass), pass},
+            {nameof(expectedOutput), expectedOutput},
+            {nameof(actualOutput), actualOutput},
+            {nameof(caller), caller}
+		});
         string originalCaller = caller ?? "";
         if (pass)
         {

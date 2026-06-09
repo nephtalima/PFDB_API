@@ -59,6 +59,11 @@ public sealed class FileParse : IFileParse
 	/// <exception cref="FileNotFoundException"></exception>
 	public string FileReader(string filepath)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(filepath), filepath}
+		});
+
 		if (filepath == null)
 		{
 			PFDBLogger.LogError("File path specified cannot be null.", parameter: nameof(filepath));
@@ -105,6 +110,16 @@ public sealed class FileParse : IFileParse
 	/// <inheritdoc/>
 	public IStatisticCollection FindAllStatisticsInFileWithTypes(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod, bool consoleWrite = false)
 	{
+
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(acceptableSpaces), acceptableSpaces},
+			{nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
+			{nameof(stringComparisonMethod), stringComparisonMethod},
+			{nameof(consoleWrite), consoleWrite}
+		});
+
 		//IDictionary<SearchTargets, string> temp = new Dictionary<SearchTargets, string>();
 		IStatisticParse statisticParse = new StatisticParse(_WID, _filetext, acceptableSpaces, acceptableCorruptedWordSpaces, consoleWrite);
 		IStatisticCollection statistics = new StatisticCollection(_WID);

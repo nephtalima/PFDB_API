@@ -39,6 +39,11 @@ public static class ParseTesting {
     /// <param name="stringComparisonMethod"></param>
     public static bool Test(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod /*= StringComparison.InvariantCultureIgnoreCase*/)
     {
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(acceptableSpaces), acceptableSpaces},
+            {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         int score = 0;
         PFDBLogger.LogInformation($"\u001b[1;35mBeginning parse testing: (parameters: acceptableSpaces: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces})");
         PFDBLogger.LogInformation("");
@@ -79,6 +84,10 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool IndexSearchSingleWordTest(StringComparison stringComparisonMethod) {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         IIndexSearch testing1 = new IndexSearch(
             "the quick brown fox jumps over the lazy fox",
             "fox", stringComparisonMethod);
@@ -98,6 +107,10 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool IndexSearchSingleCharacterTest(StringComparison stringComparisonMethod) {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         IIndexSearch testing1 = new IndexSearch(
             "the quick brown fox jumps over the lazy dog",
             "o", stringComparisonMethod);
@@ -117,6 +130,10 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool IndexSearchNoOccurencesTest(StringComparison stringComparisonMethod) {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         IIndexSearch testing1 = new IndexSearch(
             "the quick brown fox jumps over the lazy dog",
             "1", stringComparisonMethod);
@@ -132,6 +149,12 @@ public static class ParseTesting {
     /// <returns>Whether this test passes.</returns>
     public static bool CorruptedWordFixTest(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod)
     {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(acceptableSpaces), acceptableSpaces},
+            {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         StatisticParse AN94 = new StatisticParse(new WeaponIdentification(new PhantomForcesVersion("10.0.1"), Categories.AssaultRifles, 11, 0, "AN-94"), sampleText, acceptableSpaces, acceptableCorruptedWordSpaces);
         string corruptedWord = AN94._corruptedWordFixer("CAPACITY", stringComparisonMethod);
         sampleText = sampleText.Replace(corruptedWord.TrimEnd(), "CAPACITY");
@@ -143,6 +166,12 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool StatisticParseMatchTest(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod) {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(acceptableSpaces), acceptableSpaces},
+            {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         StatisticParse AN94 = new StatisticParse(new WeaponIdentification(new PhantomForcesVersion("10.0.1"), Categories.AssaultRifles, 11, 0, "AN-94"), sampleText, acceptableSpaces, acceptableCorruptedWordSpaces);
         SearchTargets target = SearchTargets.WeaponWalkspeed;
         bool status = false;
@@ -170,6 +199,8 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool AddingIncompatibleWeaponsToStatisticCollectionTest() {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         int score = 0;
 
         WeaponIdentification G11K2 = new WeaponIdentification(
@@ -210,6 +241,8 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool StatisticOptionToSearchTargetTest() {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         List<StatisticOptions> options = new List<StatisticOptions>(){
                     StatisticOptions.TotalAmmoCapacity,
                     StatisticOptions.MagazineCapacity,
@@ -245,6 +278,8 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool SearchTargetToStatisticOptionTest() {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         List<StatisticOptions> options = new List<StatisticOptions>(){
                     StatisticOptions.TotalAmmoCapacity,
                     StatisticOptions.MagazineCapacity,
@@ -288,6 +323,8 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool FileReaderTest() {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
         int score = 0;
 
         Guid guid = Guid.NewGuid();
@@ -327,6 +364,12 @@ public static class ParseTesting {
     /// </summary>
     /// <returns>Whether this test passes.</returns>
     public static bool FileParseCompleteTest(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod) {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(acceptableSpaces), acceptableSpaces},
+            {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
+            {nameof(stringComparisonMethod), stringComparisonMethod}
+		});
         WeaponIdentification AN94 = new WeaponIdentification(new PhantomForcesVersion("10.0.1"), Categories.AssaultRifles, 11, 0, "AN-94");
         FileParse AN94parse = new FileParse(AN94, sampleText);
 
@@ -562,6 +605,13 @@ public static class ParseTesting {
     /// <param name="caller">Leave blank unless you wish to override the original test function name.</param>
     /// <returns>Whether the test passed or failed (equivalent to the value of "pass".)</returns>
     public static bool TestingOutput(string testName, bool pass, string expectedOutput, string actualOutput, [CallerMemberName] string caller = "") {
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(testName), testName},
+            {nameof(pass), pass},
+            {nameof(expectedOutput), expectedOutput},
+            {nameof(caller),caller}
+		});
         string originalCaller = caller ?? "";
         if (pass) {
             PFDBLogger.LogInformation($"{testName}\u001b[1;32m passed.\u001b[0;0m Expected: {expectedOutput}. Got: {actualOutput}", originalCaller);

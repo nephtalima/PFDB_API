@@ -1,5 +1,6 @@
 ﻿using PFDB.StatisticUtility;
 using PFDB.WeaponUtility;
+using PFDB.Logging;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,6 +39,12 @@ public class Statistic : IStatistic
 	/// <param name="option">The type of statistic being added.</param>
 	public Statistic(bool needsRevision, IEnumerable<string> statistics, WeaponIdentification weaponID, StatisticOptions option)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(needsRevision), needsRevision},
+			{nameof(statistics), statistics},
+			{nameof(weaponID), weaponID},
+			{nameof(option), option}
+		});
 		_WID = weaponID;
 		_option = option;
 		_statistics = statistics;
@@ -56,6 +63,13 @@ public class Statistic : IStatistic
 	/// <param name="option">The type of statistic being added.</param>
 	public Statistic(bool needsRevision, string statistic, WeaponIdentification weaponID, StatisticOptions option)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(needsRevision), needsRevision},
+			{nameof(statistic), statistic},
+			{nameof(weaponID), weaponID},
+			{nameof(option), option}
+		});
 		_WID = weaponID;
 		_option = option;
 		_statistics = new List<string>() { statistic };

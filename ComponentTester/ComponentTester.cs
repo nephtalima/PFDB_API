@@ -152,6 +152,10 @@ public class ComponentTester
 	}
 
 
+	/// <summary>
+	/// Entry point of the program.
+	/// </summary>
+	/// <param name="args">Arguments to pass in</param>
 	public static void Main(string[] args)
 	{
 

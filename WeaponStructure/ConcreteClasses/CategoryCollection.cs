@@ -1,4 +1,5 @@
 ﻿using PFDB.WeaponUtility;
+using PFDB.Logging;
 
 namespace PFDB.WeaponStructure;
 
@@ -35,12 +36,18 @@ public class CategoryCollection : List<ICategory>, ICategoryCollection
 	/// <param name="categories">The list of categories to add to the collection.</param>
 	public CategoryCollection(IEnumerable<ICategory> categories)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(categories), categories}
+		});
 		this.AddRange(categories);
 	}
 
 	/// <inheritdoc/>
 	public new void Add(ICategory category)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(category), category}
+		});
 		//todo: add checks
 		base.Add(category);
 	}
@@ -48,6 +55,9 @@ public class CategoryCollection : List<ICategory>, ICategoryCollection
 	/// <inheritdoc/>
 	public new void AddRange(IEnumerable<ICategory> categories)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(categories), categories}
+		});
 		//todo: add checks
 		base.AddRange(categories);
 	}
@@ -55,6 +65,9 @@ public class CategoryCollection : List<ICategory>, ICategoryCollection
 	/// <inheritdoc/>
 	public void Add(ICategoryCollection categoryCollection)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(categoryCollection), categoryCollection}
+		});
 		//todo: add checks
 		base.AddRange(categoryCollection.Categories);
 	}

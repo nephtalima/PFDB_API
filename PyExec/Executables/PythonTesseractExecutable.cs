@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using PFDB.Logging;
 using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
@@ -68,6 +69,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 	/// </summary>
 	public PythonTesseractExecutable()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		PFDBLogger.LogDebug("PythonTesseractExecutable unused constructor called");
 		_WID = new WeaponIdentification(new PhantomForcesVersion(8, 0, 0), 0, 0, 0);
 		_fileDirectory = string.Empty;
@@ -83,6 +86,14 @@ public class PythonTesseractExecutable : IPythonExecutable
 	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion = true)
 	{
 
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(filename), filename},
+			{nameof(fileDirectory), fileDirectory},
+			{nameof(weaponID), weaponID.ID},
+			{nameof(weaponType), weaponType},
+			{nameof(programDirectory), programDirectory},
+			{nameof(isDefaultConversion), isDefaultConversion}
+		});
 		PFDBLogger.LogDebug("PythonTesseractExecutable used constructor called");
 		_filename = filename;
 		_weaponType = weaponType;
@@ -123,6 +134,15 @@ public class PythonTesseractExecutable : IPythonExecutable
 	/// <param name="isDefaultConversion">Specifies if the images supplied are for default conversion.</param>
 	public PythonTesseractExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, string? tessbinPath, bool isDefaultConversion = true)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(filename), filename},
+			{nameof(fileDirectory), fileDirectory},
+			{nameof(weaponID), weaponID.ID},
+			{nameof(weaponType), weaponType},
+			{nameof(programDirectory), programDirectory},
+			{nameof(tessbinPath), tessbinPath},
+			{nameof(isDefaultConversion), isDefaultConversion}
+		});
 		PFDBLogger.LogDebug("PythonTesseractExecutable used constructor called");
 		_filename = filename;
 		_weaponType = weaponType;
@@ -154,6 +174,7 @@ public class PythonTesseractExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public virtual ProcessStartInfo GetProcessStartInfo()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		ProcessStartInfo pyexecute;
 		StringBuilder command = new StringBuilder("Command used: ");
 		if (TessbinPath == null)
@@ -181,6 +202,7 @@ public class PythonTesseractExecutable : IPythonExecutable
 	/// <exception cref="PythonAggregateException"></exception>
 	public virtual void CheckInput()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		_internalExecution = false;
 		PythonAggregateException aggregateException = new PythonAggregateException();
 		if ((int)WeaponType > 4 || (int)WeaponType < 1)
@@ -233,6 +255,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public virtual IOutput ReturnOutput()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		if (_internalExecution || _untrustedConstruction)
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it

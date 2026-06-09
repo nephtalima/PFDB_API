@@ -42,6 +42,11 @@ public class StatisticProofread
 	/// <exception cref="ArgumentException"></exception>
 	public static SearchTargets StatisticOptionToSearchTarget(StatisticOptions option)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(option), option}
+		});
+
 		//IEnumerable<string> list = Enum.GetNames<StatisticOptions>();
 		SearchTargets outparam;
 		bool found = Enum.TryParse(option.ToString(), true, out outparam);
@@ -61,6 +66,11 @@ public class StatisticProofread
 	/// <exception cref="ArgumentException"></exception>
 	public static StatisticOptions SearchTargetToStatisticOption(SearchTargets target)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(target), target}
+		});
+
 		StatisticOptions outparam;
 		bool found = Enum.TryParse(target.ToString(), true, out outparam);
 		if (found) return outparam;
@@ -74,6 +84,9 @@ public class StatisticProofread
 	/// <param name="weaponID">Weapon ID, for weapon type and game version.</param>
 	public StatisticProofread(WeaponIdentification weaponID)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() { 
+			{ nameof(weaponID), weaponID } 
+		});
 		_WID = weaponID;
 	}
 
@@ -85,6 +98,11 @@ public class StatisticProofread
 	/// <returns>A concete object inheriting from <see cref="IStatistic"/> containing the statistic parsed.</returns>
 	public IStatistic ApplyRegularExpression (StatisticOptions statisticTarget, string inputString)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(statisticTarget), statisticTarget},
+			{nameof(inputString), inputString}
+		});
+
 		IStatistic statistic;
 		switch (statisticTarget)
 		{
@@ -167,6 +185,11 @@ public class StatisticProofread
 
 	private static string _regexStringVerifier(Match match, string inputString = "")
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(match), match},
+			{nameof(inputString), inputString}
+		});
+
 		string statisticInputString = inputString;
 		if (match.Success)
 		{

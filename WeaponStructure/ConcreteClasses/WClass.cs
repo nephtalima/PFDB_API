@@ -1,4 +1,5 @@
 ﻿using PFDB.WeaponUtility;
+using PFDB.Logging;
 
 namespace PFDB.WeaponStructure;
 
@@ -24,6 +25,10 @@ public class Class : IClass
 	/// <param name="categories">The underlying collection of categories that comprise the weapon class.</param>
 	public Class(Classes classType, ICategoryCollection categories)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(classType), classType},
+			{nameof(categories), categories}
+		});
 		_classType = classType;
 		_categories = categories;
 	}

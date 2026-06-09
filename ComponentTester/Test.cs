@@ -86,7 +86,7 @@ public static class Test
                     if(allargs[1] != null){
                         acceptableCorruptedWordSpaces = Convert.ToInt32(allargs[1]);
                         if(acceptableCorruptedWordSpaces < 0){
-                            PFDBLogger.LogError("acceptableSpaces cannot be negative.Exiting.");
+                            PFDBLogger.LogError("acceptableCorruptedWordSpaces cannot be negative. Exiting.");
                             break;
                         } 
                     }

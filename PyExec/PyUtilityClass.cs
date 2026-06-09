@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
+using PFDB.Logging;
 
 namespace PFDB.PythonExecution;
 
@@ -25,6 +27,11 @@ public static class PyUtilityClass
 	/// <exception cref="Exception">Throws exceptions if two paths are unequal when they should be. (illegal case)</exception>
 	public static (string relativeCurrentPath, string relativeForeignPath) CommonExecutionPath(string currentProcessPath, string foreignPath)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(currentProcessPath), currentProcessPath},
+			{nameof(foreignPath), foreignPath}
+		});
 		string tempCurrent = currentProcessPath;
 		string tempForeign = foreignPath;
 		if (!currentProcessPath.StartsWith(foreignPath) && !foreignPath.StartsWith(currentProcessPath))

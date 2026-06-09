@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 using PFDB.Logging;
 using PFDB.PythonExecutionUtility;
 using PFDB.PythonFactory;
@@ -85,6 +86,10 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 	/// <param name="destination">Output destination for the enclosed <see cref="IOutput"/> object.</param>
 	public PythonExecutor(OutputDestination destination)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(destination), destination}
+		});
 		_input = new InitExecutable(); _output = new TestOutput();
 		_destination = destination;
 		_output = new TestOutput(); //prevent unassigned reference
@@ -96,6 +101,10 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 	/// <exception cref="ArgumentException"></exception>
 	public void Load(IPythonExecutable input)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(input), input.WeaponID}
+		});
 		//edge case where IPythonExecutable is loaded with a FailedPythonOutput type
 		/*if(input is IPythonExecutable)
 		{
@@ -114,6 +123,9 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 	/// <exception cref="ArgumentException"></exception>
 	public IPythonExecutor LoadOut(IPythonExecutable input)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(input), input.WeaponID}
+		});
 		//edge case where IPythonExecutable is loaded with a FailedPythonOutput type
 		/*if (input is IPythonExecutable<FailedPythonOutput>)
 		{
@@ -129,6 +141,9 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 	/// <exception cref="ArgumentException"></exception>
 	public void Execute(object? bs)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(bs), bs}
+		});
 		PFDBLogger.LogInformation($"Executing PythonExecutor with file {_input.Filename} with WeaponID {_input.WeaponID.ID} from version {_input.WeaponID.Version.VersionNumber}");
 		try
 		{
@@ -195,6 +210,7 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 	///<inheritdoc/>
 	public new string ToString()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		return _output.ToString();
 	}
 }

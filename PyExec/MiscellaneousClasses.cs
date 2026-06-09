@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Collections.Generic;
 using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
+using PFDB.Logging;
 
 namespace PFDB.PythonExecution;
 
@@ -20,11 +22,15 @@ internal class TestOutput : IOutput
 	/// </summary>
 	public TestOutput()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		this.OutputString = "init object";
 	}
 	/// <inheritdoc/>
 	public new string ToString()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		return this.OutputString;
 	}
 }
@@ -38,6 +44,7 @@ internal class InitExecutable : IPythonExecutable
 	/// Dummy default constructor.
 	/// </summary>
 	public InitExecutable() {
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 	}
 
 	/// <summary>
@@ -65,6 +72,7 @@ internal class InitExecutable : IPythonExecutable
 	/// </summary>
 	public void CheckInput()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		return;
 	}
 
@@ -74,6 +82,7 @@ internal class InitExecutable : IPythonExecutable
 	/// <returns>Blank <see cref="ProcessStartInfo"/>.</returns>
 	public ProcessStartInfo GetProcessStartInfo()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		return new ProcessStartInfo();
 	}
 
@@ -83,6 +92,7 @@ internal class InitExecutable : IPythonExecutable
 	/// <returns>Blank <see cref="TestOutput"/>.</returns>
 	public IOutput ReturnOutput()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		return new TestOutput();
 	}
 
@@ -97,6 +107,13 @@ internal class InitExecutable : IPythonExecutable
 	/// <returns>The current object for chaining.</returns>
 	public IPythonExecutable Construct(string filename, string fileDirectory, PhantomForcesVersion version, WeaponType weaponType, string programDirectory)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(filename), filename},
+			{nameof(fileDirectory), fileDirectory},
+			{nameof(version), version.VersionString},
+			{nameof(weaponType), weaponType},
+			{nameof(programDirectory), programDirectory}
+		});
 		Filename = filename;
 		ProgramDirectory = programDirectory;
 		Version = version;
@@ -108,6 +125,14 @@ internal class InitExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(filename), filename},
+			{nameof(fileDirectory), fileDirectory},
+			{nameof(weaponID), weaponID.ID},
+			{nameof(weaponType), weaponType},
+			{nameof(programDirectory), programDirectory}
+		});
 		Filename = filename;
 		ProgramDirectory = programDirectory;
 		Version = weaponID.Version;

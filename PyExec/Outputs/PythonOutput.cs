@@ -1,4 +1,6 @@
 ﻿using PFDB.PythonExecutionUtility;
+using PFDB.Logging;
+using System.Collections.Generic;
 
 namespace PFDB.PythonExecution;
 
@@ -19,12 +21,18 @@ public class PythonOutput : IOutput
     /// <param name="outputString">Output string from result.</param>
     public PythonOutput(string outputString)
     {
+        
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+            {nameof(outputString), outputString}
+        });
         OutputString = outputString;
     }
 
     /// <inheritdoc/>
     public new string ToString()
     {
+        
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
         return OutputString;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.Generic;
 using PFDB.Logging;
 using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
@@ -51,6 +52,8 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// </summary>
 	internal PythonCropExecutable()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		_WID = new WeaponIdentification(new PhantomForcesVersion(8, 0, 0), 0, 0, 0);
 		_fileDirectory = string.Empty;
 		_filename = string.Empty;
@@ -61,6 +64,15 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion = true)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(filename), filename},
+			{nameof(fileDirectory), fileDirectory},
+			{nameof(weaponID), weaponID.ID},
+			{nameof(weaponType), weaponType},
+			{nameof(programDirectory), programDirectory},
+			{nameof(isDefaultConversion), isDefaultConversion}
+		});
 		if (!programDirectory.EndsWith('\\'))
 		{
 			programDirectory += '\\';
@@ -82,6 +94,8 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public void CheckInput()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		PythonAggregateException aggregateException = new PythonAggregateException();
 		_internalExecution = false;
 		if ((File.Exists(ProgramDirectory + "impa.exe") == false && _isWindows) || (File.Exists(ProgramDirectory + "impa") == false && _isLinux))
@@ -112,6 +126,8 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public ProcessStartInfo GetProcessStartInfo()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		ProcessStartInfo pyexecute;
 		pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), string.Format("{0} {1} {2} {3}", "-w", FileDirectory + Filename, Convert.ToString(WeaponType), WeaponID.Version.VersionNumber.ToString()));
 		pyexecute.RedirectStandardOutput = true;
@@ -125,6 +141,8 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <returns>Output string from Python application.</returns>
 	public IOutput ReturnOutput()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		if (_internalExecution || _untrustedConstruction)
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it

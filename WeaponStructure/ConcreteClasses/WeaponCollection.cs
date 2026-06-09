@@ -1,4 +1,5 @@
 ﻿using PFDB.WeaponUtility;
+using PFDB.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ public class WeaponCollection : List<IWeapon>, IWeaponCollection
 	/// </summary>
 	public WeaponCollection()
 	{
-
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 	}
 
 	/// <summary>
@@ -45,13 +46,19 @@ public class WeaponCollection : List<IWeapon>, IWeaponCollection
 	/// <param name="weapons">The list of weapons to add to the collection.</param>
 	public WeaponCollection(IEnumerable<IWeapon> weapons)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weapons), weapons}
+		});
 		this.AddRange(weapons);
 	}
 
 	/// <inheritdoc/>
 	public new void Add(IWeapon weapon)
 	{
-
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weapon), weapon}
+		});
 		//todo: add checks
 		base.Add(weapon);
 	}
@@ -59,6 +66,9 @@ public class WeaponCollection : List<IWeapon>, IWeaponCollection
 	/// <inheritdoc/>
 	public new void AddRange(IEnumerable<IWeapon> weapons)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weapons), weapons}
+		});
 		//todo: add checks
 		base.AddRange(weapons);
 	}
@@ -66,6 +76,9 @@ public class WeaponCollection : List<IWeapon>, IWeaponCollection
 	/// <inheritdoc/>
 	public void Add(IWeaponCollection weapons)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weapons), weapons}
+		});
 		//todo: add checks
 		base.AddRange(weapons.Weapons);
 	}

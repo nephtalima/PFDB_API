@@ -71,6 +71,9 @@ public static class WeaponTable
 
 	private static void _assignWeaponNumbers()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
 		Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification, int)>> weaponNumberPairs = new Dictionary<PhantomForcesVersion, HashSet<(WeaponIdentification, int)>>();
 		Stopwatch stopwatch = Stopwatch.StartNew();
 		foreach (PhantomForcesVersion currentVersion in _weaponIDCache.Keys)
@@ -105,6 +108,9 @@ public static class WeaponTable
 	/// <returns></returns>
 	public static (bool success, Stopwatch stopwatch) InitializeEverything()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
 		bool success = false;
 		Stopwatch stopwatch = Stopwatch.StartNew();
 		PFDBLogger.LogInformation("\u001b[1;34mStarting database initialization.\u001b[0;0m");
@@ -162,6 +168,11 @@ public static class WeaponTable
 	/// <returns>A connection stringbuilder from where the connection string can be obtained.</returns>
 	private static SQLiteConnectionStringBuilder _getConnectionString(string? directory = null)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(directory), directory}
+		});
+
 		string actualpath = directory ?? Directory.GetCurrentDirectory();
 		char slash = Directory.Exists("/usr/bin") ? '/' : '\\';
 		SQLiteConnectionStringBuilder builder = new SQLiteConnectionStringBuilder($@"Data Source={actualpath}{slash}{_databasePath};Version=3;FailIfMissing=True;");
@@ -202,6 +213,10 @@ public static class WeaponTable
 	/// <returns>True if the version is found within the database, false otherwise.</returns>
 	public static bool VerifyVersionIsInDatabase(PhantomForcesVersion version)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(version), version.VersionString}
+		});
 		return _listOfVersions.Contains(version);
 	}
 
@@ -212,6 +227,11 @@ public static class WeaponTable
 	/// <returns>True if the version is found within the database, false otherwise.</returns>
 	public static bool VerifyVersionIsInDatabase(int version)
 	{
+
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(version), version}
+		});
 		return _listOfVersions.Where(x => x.VersionNumber == version).Any();
 	}
 
@@ -221,6 +241,8 @@ public static class WeaponTable
 	/// <returns>A list containing integers, derived from <see cref="PhantomForcesVersion.VersionNumber"/>.</returns>
 	public static IEnumerable<int> GetListOfVersionIntegersInDatabase()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		return _listOfVersions.Select(x => x.VersionNumber);
 	}
 
@@ -230,6 +252,9 @@ public static class WeaponTable
 	/// <returns>A list of <see cref="PhantomForcesVersion"/> indicating the versions.</returns>
 	private static IEnumerable<PhantomForcesVersion> _setUpListOfVersionsInDatabase()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
 		List<PhantomForcesVersion> ints = new List<PhantomForcesVersion>();
 		using (SQLiteConnection conn = new SQLiteConnection(_getConnectionString().ConnectionString))
 		{
@@ -276,6 +301,11 @@ public static class WeaponTable
 	/// <exception cref="SQLiteException"></exception>
 	private static IDictionary<Categories, int> _getWeaponCount(PhantomForcesVersion version)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(version), version.VersionString}
+		});
+
 		try
 		{
 			using (SQLiteConnection conn = new SQLiteConnection(_getConnectionString().ConnectionString))
@@ -323,6 +353,9 @@ public static class WeaponTable
 	/// <returns>A complete list of weapon counts for every version</returns>
 	private static IDictionary<PhantomForcesVersion, Dictionary<Categories, int>> _getWeaponCountsForEveryVersion()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
 		try
 		{
 			Stopwatch stopwatch = Stopwatch.StartNew();
@@ -375,6 +408,11 @@ public static class WeaponTable
 
 	private static void _generateIndividualCumulativeChangesTablesUpToSpecificVersion(PhantomForcesVersion? targetVersion)
 	{
+
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(targetVersion), targetVersion?.VersionString}
+		});
 		//if targetVersion == null, use maximum 
 
 

@@ -240,6 +240,8 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	/// <returns>Whether the specified objest is equal to the current object.</returns>
 	public override bool Equals(object? obj)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		if (obj != null)
 		{
 			if (obj is PhantomForcesVersion objc)
@@ -256,6 +258,8 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	/// <returns>The default hash return.</returns>
 	public override int GetHashCode()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		return VersionNumber;
 	}
 
@@ -265,12 +269,16 @@ public sealed class PhantomForcesVersion : IComparable<PhantomForcesVersion>
 	/// <returns>The version string of the Phantom Forces version.</returns>
 	public override string ToString()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		return _versionString;
 	}
 
 	/// <inheritdoc/>
 	public int CompareTo(PhantomForcesVersion? other)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		if (other is null) throw new ArgumentNullException("Object being compared to cannot be null");
 
 		if (other < this) return 1;
@@ -295,6 +303,10 @@ public static class WeaponUtilityClass
 	/// <exception cref="ArgumentException"></exception>
 	public static WeaponType GetWeaponType(int categoryNumber)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(categoryNumber), categoryNumber}
+		});
 		if (categoryNumber > 19)
 		{
 			PFDBLogger.LogWarning("The category number cannot exceed 19.");
@@ -339,6 +351,10 @@ public static class WeaponUtilityClass
 	/// <exception cref="ArgumentException"></exception>
 	public static Categories GetCategoryType(int categoryNumber)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(categoryNumber), categoryNumber}
+		});
 		if (categoryNumber > 18)
 		{
 			PFDBLogger.LogWarning("The category number cannot exceed 19");
@@ -360,6 +376,10 @@ public static class WeaponUtilityClass
 	/// <returns>The weapon type that the category belongs to.</returns>
 	public static WeaponType GetWeaponType(Categories category)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(category), category}
+		});
 		return GetWeaponType((int)category);
 	}
 }

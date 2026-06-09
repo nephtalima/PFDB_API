@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PFDB.WeaponUtility;
+using PFDB.Logging;
 
 namespace PFDB.WeaponStructure;
 
@@ -35,6 +36,11 @@ public class Category : ICategory
 	/// <param name="weaponCollection">The underlying weapon collection for the category.</param>
 	public Category(Categories category, IWeaponCollection weaponCollection)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(category), category},
+			{nameof(weaponCollection), weaponCollection}
+		});
 		_weaponCollection = weaponCollection;
 		_categoryType = category;
 

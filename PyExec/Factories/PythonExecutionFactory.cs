@@ -425,7 +425,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 					smallList[k].Execute(null); return smallList[k].Output;
 				});
 				*/
-				if(tasks[k] == null)Console.WriteLine($"tasks[{k}] was null");
+				//if(tasks[k] == null)Console.WriteLine($"tasks[{k}] was null");
 
 
 				

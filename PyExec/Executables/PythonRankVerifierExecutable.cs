@@ -1,5 +1,6 @@
 ﻿using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
+using PFDB.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +25,9 @@ public class PythonRankVerifierExecutable : PythonTesseractExecutable, IPythonEx
 	/// <inheritdoc/>
 	public override ProcessStartInfo GetProcessStartInfo()
 	{
+
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
 		ProcessStartInfo pyexecute;
 		StringBuilder command = new StringBuilder("Command used: ");
 		if (TessbinPath == null)

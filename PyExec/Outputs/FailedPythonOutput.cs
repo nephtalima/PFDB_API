@@ -1,4 +1,6 @@
-﻿using PFDB.PythonExecutionUtility;
+﻿using System.Collections.Generic;
+using PFDB.Logging;
+using PFDB.PythonExecutionUtility;
 
 namespace PFDB.PythonExecution;
 
@@ -21,12 +23,20 @@ internal sealed class FailedPythonOutput : IOutput
     /// <param name="outputString">Output string from result.</param>
     public FailedPythonOutput(string outputString)
     {
-        OutputString = outputString;
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+            {nameof(outputString), outputString}
+		});
+
+		OutputString = outputString;
     }
 
     /// <inheritdoc/>
     public new string ToString()
     {
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
         return OutputString;
     }
 }
