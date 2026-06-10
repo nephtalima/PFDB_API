@@ -3,6 +3,7 @@ using PFDB.SQLite;
 using PFDB.WeaponStructure;
 using PFDB.WeaponUtility;
 using Frontend.Server;
+using System.Collections.Generic;
 
 namespace Frontend.Server.Controllers
 {
