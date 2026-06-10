@@ -1,6 +1,7 @@
 ﻿using PFDB.ConversionUtility;
 using PFDB.WeaponUtility;
 using PFDB.Logging;
+using System.Collections.Generic;
 
 namespace PFDB.WeaponStructure;
 

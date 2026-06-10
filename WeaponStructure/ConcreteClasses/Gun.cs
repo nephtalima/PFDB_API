@@ -2,7 +2,7 @@
 using PFDB.ConversionUtility;
 using PFDB.WeaponUtility;
 using PFDB.Logging;
-using System.Reflection.Metadata.Ecma335;
+using System.Collections.Generic;
 
 namespace PFDB.WeaponStructure;
 

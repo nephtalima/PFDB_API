@@ -3,7 +3,7 @@ using PFDB.ConversionUtility;
 using PFDB.StatisticUtility;
 using PFDB.WeaponUtility;
 using PFDB.Logging;
-
+using System.Collections.Generic;
 namespace PFDB.WeaponStructure;
 
 

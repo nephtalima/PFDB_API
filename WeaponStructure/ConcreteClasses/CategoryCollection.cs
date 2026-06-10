@@ -1,5 +1,7 @@
 ﻿using PFDB.WeaponUtility;
 using PFDB.Logging;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PFDB.WeaponStructure;
 

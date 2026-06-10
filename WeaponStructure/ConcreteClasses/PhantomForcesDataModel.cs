@@ -7,6 +7,10 @@ using PFDB.ConversionUtility;
 using PFDB.Logging;
 using PFDB.PythonExecution;
 using PFDB.SQLite;
+using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.IO;
 
 namespace PFDB.WeaponStructure;
 
