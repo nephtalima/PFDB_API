@@ -37,9 +37,9 @@ public static class Test
             case "all":
             {
                 //relying on the first condition failing to avoid indexoutofrange exception
-                if(args.Length > 1 && (args[1].ToLowerInvariant() == "help" ||
-                    args[1].ToLowerInvariant() == "--help" ||
-                    args[1].ToLowerInvariant() == "-h")){
+                if(args.Length > 2 && (args[2].ToLowerInvariant() == "help" ||
+                    args[2].ToLowerInvariant() == "--help" ||
+                    args[2].ToLowerInvariant() == "-h")){
                         StringBuilder builder = new StringBuilder();
                         builder.Append("\n");
                         builder.Append("SUB-COMMAND OPTIONS:\n");
@@ -111,9 +111,9 @@ public static class Test
             {
                 
                 //relying on the first condition failing to avoid indexoutofrange exception
-                if(args.Length > 1 && (args[1].ToLowerInvariant() == "help" ||
-                    args[1].ToLowerInvariant() == "--help" ||
-                    args[1].ToLowerInvariant() == "-h")){
+                if(args.Length > 2 && (args[2].ToLowerInvariant() == "help" ||
+                    args[2].ToLowerInvariant() == "--help" ||
+                    args[2].ToLowerInvariant() == "-h")){
                         StringBuilder builder = new StringBuilder();
                         builder.Append("\n");
                         builder.Append("SUB-COMMAND OPTIONS:\n");
@@ -146,9 +146,9 @@ public static class Test
             case "parse":
             {
                 //relying on the first condition failing to avoid indexoutofrange exception
-                if(args.Length > 1 && (args[1].ToLowerInvariant() == "help" ||
-                    args[1].ToLowerInvariant() == "--help" ||
-                    args[1].ToLowerInvariant() == "-h")){
+                if(args.Length > 2 && (args[2].ToLowerInvariant() == "help" ||
+                    args[2].ToLowerInvariant() == "--help" ||
+                    args[2].ToLowerInvariant() == "-h")){
                         StringBuilder builder = new StringBuilder();
                         builder.Append("\n");
                         builder.Append("SUB-COMMAND OPTIONS:\n");
@@ -264,8 +264,7 @@ public static class Test
             {nameof(imageBasePath), imageBasePath},
             {nameof(tessbinPath), tessbinPath},
             {nameof(acceptableSpaces), acceptableSpaces},
-            {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
-            {nameof(tessbinPath), tessbinPath}
+            {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces}
         });
         string currentDir = Directory.GetCurrentDirectory();
 
