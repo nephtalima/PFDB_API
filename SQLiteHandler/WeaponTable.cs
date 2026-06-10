@@ -276,8 +276,9 @@ public static class WeaponTable
 							{
 								ints.Add(new PhantomForcesVersion(currentLineMatcher.Value));
 							}
-							catch
+							catch(Exception e)
 							{
+								PFDBLogger.LogDebug($"An error happened when trying to process {currentLineMatcher.Value}: {e.Message}");
 								continue;
 							}
 						}
