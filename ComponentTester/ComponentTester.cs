@@ -35,6 +35,9 @@ public class ComponentTester
 	 *	
 	 */
 
+	/// <summary>
+	/// Enum that defines the main operation pathways for the CLI.
+	/// </summary>
 	public enum Operations
 	{
 		Help = 0,
@@ -48,12 +51,16 @@ public class ComponentTester
 	}
 
 	// displays help
+	/// <summary>
+	/// Displays the main help message.
+	/// </summary>
 	public static void DisplayHelp()
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		//ConsoleColor initial = Console.BackgroundColor;
 		//Console.BackgroundColor = ConsoleColor.DarkRed;
 		StringBuilder builder = new StringBuilder();
-
+		builder.Append("\n");
 		builder.Append("PFDB - Phantom Forces Database.\n");
 		builder.Append("This tool scans a bulk set of images and dumps the data into text files.\n");
 		builder.Append("It also parses the files and makes objects from them. Currently this does not do much, but will change.\n");
@@ -64,9 +71,9 @@ public class ComponentTester
 		builder.Append("LIST OF COMMANDS:\n");
 		builder.Append("help\t\tDisplays this help message.\n");
 		builder.Append("test\t\tTests Python execution and file parsing capabilities.\n");
-		builder.Append("build\n");
-		builder.Append("inventory\n");
-		builder.Append("proofread\n");
+		builder.Append("build\t\t\n");
+		builder.Append("inventory\t\t\n");
+		builder.Append("proofread\t\t\n");
 		Console.WriteLine(builder.ToString());
 
 		//Console.BackgroundColor = initial;
@@ -92,6 +99,11 @@ public class ComponentTester
 	/// <returns>A list containing the (potentially null) strings to be passed downstream.</returns>
 	public static List<string?> ArgumentFiller(string[] args, int requiredNumberOfArgs, int argsOffset = 2)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(args), args},
+			{nameof(requiredNumberOfArgs), requiredNumberOfArgs},
+			{nameof(argsOffset), argsOffset}
+		});
 
 		List<string?> allargs = new List<string?>(requiredNumberOfArgs);
 		for (int i = argsOffset; i < args.Length; ++i)
@@ -110,10 +122,19 @@ public class ComponentTester
 		return allargs;
 	}
 
-	public static Operations OperationDecider(string command)
+	/// <summary>
+	/// Decides which operation to use based off of the command line arguments supplied.
+	/// </summary
+	/// <param name="commandParameterString">Command parameter string.</param>
+	/// <returns>Returns the appropriate operation based on the command parameter string.</returns>
+	public static Operations OperationDecider(string commandParameterString)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(commandParameterString), commandParameterString}
+		});
 		Operations operation = Operations.Help;
-		switch (command.ToLowerInvariant())
+		switch (commandParameterString.ToLowerInvariant())
 		{
 			case "--help":
 			case "help":
@@ -158,6 +179,11 @@ public class ComponentTester
 	/// <param name="args">Arguments to pass in</param>
 	public static void Main(string[] args)
 	{
+		
+		/*
+		1. 
+		
+		*/
 
 		if (args.Length == 0)
 		{
@@ -168,23 +194,18 @@ public class ComponentTester
 
 		for (int i = 0; i < args.Length; ++i)
 		{
-			Console.WriteLine($"arg{i}: {args[i]}");
+			//Console.WriteLine($"arg{i}: {args[i]}");
 		}
 
 		Operations operation = OperationDecider(args[0]);
 
 
-		Console.WriteLine(args[0]);
-		Console.WriteLine(args.Length);
+		//Console.WriteLine(args[0]);
+		//Console.WriteLine(args.Length);
 
 
+		//Console.WriteLine(operation);
 
-
-		
-
-		Console.WriteLine(operation);
-
-		PFDBLogger logger = new PFDBLogger(".pfdblog");
 
 		switch (operation)
 		{
@@ -202,6 +223,7 @@ public class ComponentTester
 						break;
 					}
 
+					PFDBLogger logger = new PFDBLogger(".pfdblog");
 					Test.TestCommand(args);
 
 
@@ -214,6 +236,9 @@ public class ComponentTester
 						//display build help
 						break;
 					}
+
+
+					PFDBLogger logger = new PFDBLogger(".pfdblog");
 					break;
 				}
 			case Operations.Inventory:
@@ -234,6 +259,8 @@ public class ComponentTester
 
 	public static void Inventory()
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		//list all weapons from database
 		//and sees if they exist
 	}

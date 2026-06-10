@@ -208,7 +208,14 @@ public class PFDBLogger
 		Log.Fatal(stringBuilder.ToString(), parameter);
 	}
 
-	
+	/// <summary>
+	/// Logs the arguments of a function and various caller parameters.
+	/// </summary>
+	/// <param name="arguments">Defines the argument names and their associated values (though in practice only tells the type).</param>
+	/// <param name="callerFilePath">Blank argument to identify the caller file location. DO NOT POPULATE.</param>
+	/// <param name="callerLineNumber">Blank argument to identify the caller line number. DO NOT POPULATE.</param>
+	/// <param name="caller">Blank argument to identify the caller name. DO NOT POPULATE.</param>
+	/// <param name="parameter">Optional parameter to log.</param>
 	public static void LogArguments(IDictionary<string, object?> arguments, [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string caller = "", params object?[]? parameter){
 
 		if (caller is null)
@@ -229,7 +236,7 @@ public class PFDBLogger
 			stringBuilder.Append($"'{kvp.Key}':\"{kvp.Value ?? "<null>"}\"");
 		}
 
-		Log.Information($"Invocation method '{invokingAssembly.GetName().Name}.{cls}.{caller}' with arguments {stringBuilder.ToString()}. File: {callerFilePath} InvocationLine#: {callerLineNumber}", parameter);
+		Log.Debug($"Invocation method '{invokingAssembly.GetName().Name}.{cls}.{caller}' with arguments {stringBuilder.ToString()}. File: {callerFilePath} InvocationLine#: {callerLineNumber}", parameter);
 	}
 
 }
