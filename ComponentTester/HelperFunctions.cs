@@ -1,5 +1,7 @@
 using PFDB.WeaponUtility;
 using PFDB.SQLite;
+using System.Collections.Generic;
+
 
 namespace PFDB;
 
