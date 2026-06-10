@@ -200,6 +200,7 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 				$"FileDirectory {inputpyt.FileDirectory} {Environment.NewLine}") : "")
 				);
 		}
+		PFDBLogger.LogDebug($"The output of the script was: {Output.OutputString}");
 		if (((int)Destination & (int)OutputDestination.Console) == (int)OutputDestination.Console)
 		{
 			Console.WriteLine(Output.OutputString);

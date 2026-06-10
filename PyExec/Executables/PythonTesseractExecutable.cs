@@ -191,6 +191,7 @@ public class PythonTesseractExecutable : IPythonExecutable
 		}
 		_commandExecuted = command.ToString();
 		pyexecute.RedirectStandardOutput = true;
+		pyexecute.RedirectStandardError = true;
 		pyexecute.UseShellExecute = false;
 		return pyexecute;
 	}
@@ -273,6 +274,10 @@ public class PythonTesseractExecutable : IPythonExecutable
 		{
 			if (execute != null && execute.HasExited != true)
 			{
+
+				using (StreamReader reader = execute.StandardError){
+					PFDBLogger.LogError($"\u001b[1;31mError occured while executing the Python script:\u001b[0;0m\n {reader.ReadToEnd()}");
+				}
 				using (StreamReader reader = execute.StandardOutput)
 				{
 					string result = reader.ReadToEnd();

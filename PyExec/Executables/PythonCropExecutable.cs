@@ -131,6 +131,7 @@ public sealed class PythonCropExecutable : IPythonExecutable
 		ProcessStartInfo pyexecute;
 		pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), string.Format("{0} {1} {2} {3}", "-w", FileDirectory + Filename, Convert.ToString(WeaponType), WeaponID.Version.VersionNumber.ToString()));
 		pyexecute.RedirectStandardOutput = true;
+		pyexecute.RedirectStandardError = true;
 		pyexecute.UseShellExecute = false;
 		return pyexecute;
 	}
@@ -156,6 +157,9 @@ public sealed class PythonCropExecutable : IPythonExecutable
 			{
 				if (execute != null)
 				{
+					using (StreamReader reader = execute.StandardError){
+						PFDBLogger.LogError($"\u001b[1;31mError occured while executing the Python script:\u001b[0;0m\n {reader.ReadToEnd()}");
+					}
 					using (StreamReader reader = execute.StandardOutput)
 					{
 						string result = reader.ReadToEnd();
