@@ -192,7 +192,7 @@ public class PythonExecutor : IPythonExecutor, IAwaitable
 			File.WriteAllText($"{Directory.GetCurrentDirectory()}/{_outputFolderName}/{_input.WeaponID.Version.VersionNumber}/{_input.Filename}.pfdb", _output.OutputString);
 			File.WriteAllText($"{Directory.GetCurrentDirectory()}/{_logFolderName}/{_input.WeaponID.Version.VersionNumber}/{_input.Filename}.pfdblog",
 				$"Filename: {_input.Filename} {Environment.NewLine}" +
-				$"Program Directory: {_input.ProgramDirectory} {Environment.NewLine}" +
+				$"Program Directory: {_input.PythonVirtualEnvironmentDirectory} {Environment.NewLine}" +
 				((_output is Benchmark benchmark) ? $"Elapsed time by DateTime (s): { benchmark.StopwatchDateTime.TotalSeconds}, Elapsed time by Stopwatch (s): { benchmark.StopwatchNormal.ElapsedMilliseconds / (double)1000}{Environment.NewLine}": "") +
 				((_input is PythonTesseractExecutable inputpyt) ? ($"PF Version: {inputpyt.WeaponID.Version.VersionNumber} {Environment.NewLine}" +
 				$"Weapon Type: {inputpyt.WeaponType} {Environment.NewLine}" +

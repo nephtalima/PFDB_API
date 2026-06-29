@@ -55,7 +55,12 @@ internal class InitExecutable : IPythonExecutable
 	/// <summary>
 	/// Dummy program directory.
 	/// </summary>
-	public string ProgramDirectory { get; private set; } = string.Empty;
+	public string PythonVirtualEnvironmentDirectory { get; private set; } = string.Empty;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public string ScriptDirectory {get; private set; } = string.Empty;
 
 	/// <summary>
 	/// Dummy version.
@@ -103,27 +108,30 @@ internal class InitExecutable : IPythonExecutable
 	/// <param name="fileDirectory">Dummy parameter.</param>
 	/// <param name="version">Dummy parameter.</param>
 	/// <param name="weaponType">Dummy parameter.</param>
-	/// <param name="programDirectory">Dummy parameter.</param>
+	/// <param name="pythonVirtualEnvironmentDirectory">Dummy parameter.</param>
+	/// <param name="scriptDirectory">Directory where the Python impa.py script resides.</param>
 	/// <returns>The current object for chaining.</returns>
-	public IPythonExecutable Construct(string filename, string fileDirectory, PhantomForcesVersion version, WeaponType weaponType, string programDirectory)
+	public IPythonExecutable Construct(string filename, string fileDirectory, PhantomForcesVersion version, WeaponType weaponType, string pythonVirtualEnvironmentDirectory, string scriptDirectory)
 	{
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
 			{nameof(filename), filename},
 			{nameof(fileDirectory), fileDirectory},
 			{nameof(version), version.VersionString},
 			{nameof(weaponType), weaponType},
-			{nameof(programDirectory), programDirectory}
+			{nameof(scriptDirectory), scriptDirectory},
+			{nameof(pythonVirtualEnvironmentDirectory), pythonVirtualEnvironmentDirectory}
 		});
 		Filename = filename;
-		ProgramDirectory = programDirectory;
+		PythonVirtualEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
 		Version = version;
 		WeaponType = weaponType;
-		ProgramDirectory = programDirectory;
+		PythonVirtualEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
+		ScriptDirectory = scriptDirectory;
 		return this;
 	}
 
 	/// <inheritdoc/>
-	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion)
+	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string pythonVirtualEnvironmentDirectory, string scriptDirectory, bool isDefaultConversion)
 	{
 		
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
@@ -131,13 +139,15 @@ internal class InitExecutable : IPythonExecutable
 			{nameof(fileDirectory), fileDirectory},
 			{nameof(weaponID), weaponID.ID},
 			{nameof(weaponType), weaponType},
-			{nameof(programDirectory), programDirectory}
+			{nameof(scriptDirectory), scriptDirectory},
+			{nameof(pythonVirtualEnvironmentDirectory), pythonVirtualEnvironmentDirectory}
 		});
 		Filename = filename;
-		ProgramDirectory = programDirectory;
+		PythonVirtualEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
 		Version = weaponID.Version;
 		WeaponType = weaponType;
-		ProgramDirectory = programDirectory;
+		PythonVirtualEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
+		ScriptDirectory = scriptDirectory;
 		IsDefaultConversion = isDefaultConversion;
 		return this;
 	}

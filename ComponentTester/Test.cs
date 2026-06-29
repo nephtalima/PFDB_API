@@ -45,8 +45,9 @@ public static class Test
                         builder.Append("SUB-COMMAND OPTIONS:\n");
                         builder.Append("pfdb test all (pythonProgramPath) (imageBasePath) (tessbinPath) (acceptableSpaces) (acceptableCorruptedWordSpaces)\n");
                         builder.Append('\n');
-                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is the current working directory.\n");
+                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is the current working directory.\nIt is recommended to use a Python virtual environment for local builds.\n");
                         builder.Append("imageBasePath: Path to the root of the images. \n\tThis folder must contain folders named as version<versionNumber>. versionNumber can be found with 'pfdb inventory'. Can be either relative or absolute path. \n\tDefault is the current working directory.\n");
+                        builder.Append("scriptDirectory: Path to the Python script file (usually named impa.py).\n\tThis must be the folder of the script file.\n\tDefault is the currenty workign directory.\n");
                         builder.Append("tessbinPath: Path to the root of the Tesseract training data (this folder is usually called tessbin). \n\tCan be either relative or absolute path. \n\tDefault is the current working directory.\n");
                         builder.Append($"acceptableSpaces: Maxiumum number of acceptable spaces between words when detecting statistics.\n\tDefault is {AcceptableSpaces} spaces.\n");
                         builder.Append($"acceptableCorruptedWordSpaces: Maxiumum number of acceptable spaces between corrupted words when fixing and detecting statistics.\n\tDefault is {AcceptableCorruptedWordSpaces} spaces.\n");
@@ -56,16 +57,18 @@ public static class Test
                 }
 
                 // add all arguments without the first two arguments
-                List<string?> allargs = ComponentTester.ArgumentFiller(args: args, requiredNumberOfArgs: 5);
+                List<string?> allargs = ComponentTester.ArgumentFiller(args: args, requiredNumberOfArgs: 6);
 
 
-                //we need 5 arguments:
+                //we need 6 arguments:
                 // python program path
-                string? pythonProgramPath = allargs[0];
+                string? pythonVirtualEnvironmentPath = allargs[0];
                 // image base path
                 string? imageBasePath = allargs[1];
+                // script directory 
+                string? scriptDirectory = allargs[2];
                 // tessbin path
-                string? tessbinPath = allargs[2];
+                string? tessbinPath = allargs[3];
 
                 int? acceptableSpaces = null; //allargs[3]
                 int? acceptableCorruptedWordSpaces = null; //allargs[4]
@@ -94,12 +97,13 @@ public static class Test
                 }
 
 
-                PFDBLogger.LogInformation($"pythonProgramPath: {pythonProgramPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+                PFDBLogger.LogInformation($"pythonProgramPath: {pythonVirtualEnvironmentPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
 
 
                 Test.TestAll(
-                    pythonProgramPath: pythonProgramPath, 
+                    pythonVirtualEnvironmentPath: pythonVirtualEnvironmentPath, 
                     imageBasePath: imageBasePath, 
+                    scriptDirectory: scriptDirectory,
                     tessbinPath: tessbinPath,
                     acceptableSpaces: acceptableSpaces,
                     acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces,
@@ -119,28 +123,31 @@ public static class Test
                         builder.Append("SUB-COMMAND OPTIONS:\n");
                         builder.Append("pfdb test py(thon) (pythonProgramPath) (imageBasePath) (tessbinPath)\n");
                         builder.Append('\n');
-                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is the current working directory.\n");
+                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is the current working directory.\nIt is recommended to use a Python virtual environment for local builds.\n");
                         builder.Append("imageBasePath: Path to the root of the images. \n\tThis folder must contain folders named as version<versionNumber>. versionNumber can be found with 'pfdb inventory'. Can be either relative or absolute path. \n\tDefault is the current working directory.\n");
+                        builder.Append("scriptDirectory: Path to the Python script file (usually named impa.py).\n\tThis must be the folder of the script file.\n\tDefault is the currenty workign directory.\n");
                         builder.Append("tessbinPath: Path to the root of the Tesseract training data (this folder is usually called tessbin). \n\tCan be either relative or absolute path. \n\tDefault is the current working directory.\n");
                         builder.Append($"\nCurrent working directory: {Directory.GetCurrentDirectory()}");
                         Console.WriteLine(builder.ToString());
                         break;
                 }
 
-                List<string?> allargs = ComponentTester.ArgumentFiller(args: args, requiredNumberOfArgs: 3);
+                List<string?> allargs = ComponentTester.ArgumentFiller(args: args, requiredNumberOfArgs: 4);
 
-                //we need 3 arguments:
+                //we need 4 arguments:
                 // python program path
-                string? pythonProgramPath = allargs[0];
+                string? pythonVirtualEnvironmentPath = allargs[0];
                 // image base path
                 string? imageBasePath = allargs[1];
+                // script directory 
+                string? scriptDirectory = allargs[2];
                 // tessbin path
-                string? tessbinPath = allargs[2];
+                string? tessbinPath = allargs[3];
 
-                PFDBLogger.LogInformation($"pythonProgramPath: {pythonProgramPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath}");
+                PFDBLogger.LogInformation($"pythonProgramPath: {pythonVirtualEnvironmentPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath}");
 
 
-                Test.TestPython(pythonProgramPath: pythonProgramPath, imageBasePath: imageBasePath, tessbinPath: tessbinPath); 
+                Test.TestPython(pythonVirtualEnvironmentPath: pythonVirtualEnvironmentPath, imageBasePath: imageBasePath, scriptDirectory: scriptDirectory, tessbinPath: tessbinPath); 
                 break;
             }
             case "parse":
@@ -207,19 +214,19 @@ public static class Test
     /// <summary>
     /// Calls the main Python testing function.
     /// </summary>
-    /// <param name="pythonProgramPath">Path to the Python executable.</param>
+    /// <param name="pythonVirtualEnvironmentPath">Path to the Python executable.</param>
     /// <param name="imageBasePath">Path to the image root folder.</param>
     /// <param name="tessbinPath">Path to the root of the Tesseract training data (this folder is usually called tessbin).</param>
-    public static void TestPython(string? pythonProgramPath, string? imageBasePath, string? tessbinPath)
+    public static void TestPython(string? pythonVirtualEnvironmentPath, string? imageBasePath, string? scriptDirectory, string? tessbinPath)
     {
 
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
-            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(pythonVirtualEnvironmentPath), pythonVirtualEnvironmentPath},
             {nameof(imageBasePath), imageBasePath},
             {nameof(tessbinPath), tessbinPath}
         });
         string currentDir = Directory.GetCurrentDirectory();
-        PythonTest.Test(pythonProgramPath ?? currentDir, imageBasePath ?? currentDir, tessbinPath);
+        PythonTest.Test(pythonVirtualEnvironmentPath ?? currentDir, imageBasePath ?? currentDir, scriptDirectory ?? currentDir, tessbinPath);
     }
 
     
@@ -251,16 +258,16 @@ public static class Test
     /// <summary>
     /// Calls the all the testing functions (Python and parsing).
     /// </summary>
-    /// <param name="pythonProgramPath">Path to the Python executable.</param>
+    /// <param name="pythonVirtualEnvironmentPath">Path to the Python executable.</param>
     /// <param name="imageBasePath">Path to the image root folder.</param>
     /// <param name="tessbinPath">Path to the root of the Tesseract training data (this folder is usually called tessbin).</param>
     /// <param name="acceptableSpaces">Specifies the acceptable number spaces between both words.</param>
     /// <param name="acceptableCorruptedWordSpaces">Specifies the acceptable number spaces that a corrupted word can have.</param>
     /// <param name="stringComparisonMethod">Specifies the StringComparison method to be used.</param>
-    public static void TestAll(string? pythonProgramPath, string? imageBasePath, string? tessbinPath, int? acceptableSpaces, int? acceptableCorruptedWordSpaces, StringComparison? stringComparisonMethod)
+    public static void TestAll(string? pythonVirtualEnvironmentPath, string? imageBasePath, string? scriptDirectory, string? tessbinPath, int? acceptableSpaces, int? acceptableCorruptedWordSpaces, StringComparison? stringComparisonMethod)
     {
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
-            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(pythonVirtualEnvironmentPath), pythonVirtualEnvironmentPath},
             {nameof(imageBasePath), imageBasePath},
             {nameof(tessbinPath), tessbinPath},
             {nameof(acceptableSpaces), acceptableSpaces},
@@ -273,7 +280,7 @@ public static class Test
             acceptableSpaces ?? AcceptableSpaces,
             acceptableCorruptedWordSpaces ?? AcceptableCorruptedWordSpaces,
             stringComparisonMethod ?? StringComparisonMethod);
-        PythonTest.Test(pythonProgramPath ?? currentDir, imageBasePath ?? currentDir, tessbinPath);
+        PythonTest.Test(pythonVirtualEnvironmentPath ?? currentDir, imageBasePath ?? currentDir,  scriptDirectory ?? currentDir, tessbinPath);
     }
 
 

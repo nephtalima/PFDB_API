@@ -12,7 +12,7 @@ $(OUTPUT_DIR)/ComponentTester.dll: $(ALL_FILES)
 
 all:
 	make -C $(IMAGEPARSER_DIR)
-	cp -vuaf $(IMAGEPARSER_DIR)/dist/impa* $(MAKE_DIR)/$(OUTPUT_DIR)/
+	cp -vuaf $(IMAGEPARSER_DIR)/impa.py $(MAKE_DIR)/$(OUTPUT_DIR)/
 	cp -vuraf $(IMAGEPARSER_DIR)/tessbin/ $(MAKE_DIR)/$(OUTPUT_DIR)/
 	cp -vuaf $(PARENT_DIR)/weapon_database.db $(MAKE_DIR)/$(OUTPUT_DIR)/
 	cp -vuaf $(PARENT_DIR)/PyExec/file.txt $(MAKE_DIR)/$(OUTPUT_DIR)/

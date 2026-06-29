@@ -30,7 +30,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 {
 	/// <summary>
 	/// Each IPythonExecutable is contained in its own IPythonExecutor. This queue feeds the machine
-	/// </summary>
+	/// </summary>	
 	private readonly List<IPythonExecutor> _queue;
 	private readonly int _coreCount;
 	private readonly int _initialQueueCount;
@@ -49,21 +49,24 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 	/// <summary>
 	/// Adds to _queue the required objects for the factory to run.
 	/// </summary>
-	/// <param name="outputDestination"></param>
-	/// <param name="categoryGroup"></param>
-	/// <param name="weaponNumber"></param>
+	/// <param name="outputDestination">Specifies the output destination.</param>
+	/// <param name="categoryGroup">Specifies the category of the weapon.</param>
+	/// <param name="weaponNumber">Specifies the weapon number.</param>
 	/// <param name="imagePath"></param>
 	/// <param name="version"></param>
-	/// <param name="programDirectory"></param>
+	/// <param name="pythonVirtualEnvironmentDirectory">Directory where the Python executable resides (Supports virtual environments).</param>
+	/// <param name="scriptDirectory">Directory where the Python impa.py script resides.</param>
 	/// <param name="tessbinPath"></param>
 	/// <param name="pythonExecutable"></param>
-	private void _constructorHelper(OutputDestination outputDestination, Categories categoryGroup, int weaponNumber, string imagePath, PhantomForcesVersion version, string programDirectory, string? tessbinPath, TPythonExecutable pythonExecutable)
+	private void _constructorHelper(OutputDestination outputDestination, Categories categoryGroup, int weaponNumber, string imagePath, PhantomForcesVersion version, string pythonVirtualEnvironmentDirectory, string scriptDirectory, string? tessbinPath, TPythonExecutable pythonExecutable)
 	{
 		//create a PythonExecutor object 
 		PythonExecutor py = new PythonExecutor(outputDestination);
 		PFDBLogger.LogDebug("PythonExecutionFactory information. Is current object a PythonTesseractExecutable?", parameter: pythonExecutable is PythonTesseractExecutable);
 
 		//check if we have multiple screenshots for the current version
+
+
 		for (int index = 0; index < version.MultipleScreenshotsCheck(); index++)
 		{
 			//add trailing slash
@@ -109,7 +112,8 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 								imagePath,
 								WeaponTable.WeaponIDAndCategoryWeaponNumbers[version].First(x => x.weaponID.Category == categoryGroup && x.weaponNumber == weaponNumber).weaponID,
 								WeaponUtilityClass.GetWeaponType(categoryGroup),
-								programDirectory,
+								pythonVirtualEnvironmentDirectory,
+								scriptDirectory,
 								tessbinPath,
 								_isDefaultConversion
 							));
@@ -123,7 +127,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 			else
 			{
 				//here we are not using PythonTesseractExeutable, therefore tessbinpath is not used.
-				//not that PythonRankVerifierExecutable may fail here
+				//note that PythonRankVerifierExecutable may fail here
 				try
 				{
 					/*var weaponID = WeaponTable.WeaponIDCache[version].First(
@@ -139,7 +143,8 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 								imagePath,
 								WeaponTable.WeaponIDAndCategoryWeaponNumbers[version].First(x => x.weaponID.Category == categoryGroup && x.weaponNumber == weaponNumber).weaponID,
 								WeaponUtilityClass.GetWeaponType(categoryGroup),
-								programDirectory,
+								pythonVirtualEnvironmentDirectory,
+								scriptDirectory,
 								_isDefaultConversion
 							)
 						)
@@ -153,6 +158,10 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 		}
 
 
+
+		//
+		// Legacy code that no longer is needed.
+		// 
 
 		/*
 		if (version.IsLegacy)
@@ -220,13 +229,14 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 	/// </summary>
 	/// <param name="weaponNumbers">An <see cref="IDictionary{TKey, TValue}"/> object where <c>TKey</c> refers to the version of the weapons, and <c>TValue</c> contains a <see cref="Dictionary{TKey, TValue}"/> object where <c>TKey</c> refers to the category of the specified version and <c>TValue</c> contains a list of the weapon numbers for the specified category and version .</param>
 	/// <param name="versionAndPathPairs">An <see cref="IDictionary{TKey, TValue}"/> object where <c>TKey</c> refers to the Phantom Forces version, and <c>TValue</c> refers to the absolute path of where <c>TKey</c>'s version's images can be found.</param>
-	/// <param name="programDirectory">The program directory of the Python executable.</param>
+	/// <param name="pythonVirtualEnvironmentDirectory">Directory where the Python executable resides (Supports virtual environments).</param>
+	/// <param name="scriptDirectory">Directory where the Python impa.py script resides.</param>
 	/// <param name="outputDestination">Specifies the output destination.</param>
 	/// <param name="tessbinPath">Specifies the absolute path of <c>/tessbin/</c> folder. If null, assumes such folder is in the same working directory.</param>
 	/// <param name="coreCount">Specifies the core count manually. Default is dual (2) cores.</param>
 	/// <param name="isDefaultConversion">Specifies if the images supplied are for default conversion.</param>
 	/// <exception cref="DirectoryNotFoundException"/>
-	public PythonExecutionFactory(IDictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>> weaponNumbers, IDictionary<PhantomForcesVersion, string> versionAndPathPairs, string programDirectory, OutputDestination outputDestination, string? tessbinPath, Cores coreCount = Cores.Dual, bool isDefaultConversion = true)
+	public PythonExecutionFactory(IDictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>> weaponNumbers, IDictionary<PhantomForcesVersion, string> versionAndPathPairs, string pythonVirtualEnvironmentDirectory, string scriptDirectory, OutputDestination outputDestination, string? tessbinPath, Cores coreCount = Cores.Dual, bool isDefaultConversion = true)
 	{
 		TPythonExecutable pythonExecutable = new();
 
@@ -254,7 +264,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 					//iterates through each weapon
 					foreach (int weapon in weaponNumbers[version][categoryGroup])
 					{
-						_constructorHelper(outputDestination, categoryGroup, weapon, versionAndPathPairs[version], version, programDirectory, tessbinPath, pythonExecutable);
+						_constructorHelper(outputDestination, categoryGroup, weapon, versionAndPathPairs[version], version, pythonVirtualEnvironmentDirectory, scriptDirectory, tessbinPath, pythonExecutable);
 					}
 				}
 			}
@@ -272,12 +282,13 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 	/// </summary>
 	/// <param name="weaponIDs">An <see cref="IDictionary{TKey, TValue}"/> object where <c>TKey</c> refers to the category of the weapons, and <c>TValue</c> contains the weapons' numbers (in the abovementioned category).</param>
 	/// <param name="versionAndPathPairs">An <see cref="IDictionary{TKey, TValue}"/> object where <c>TKey</c> refers to the Phantom Forces version, and <c>TValue</c> refers to the absolute path of where <c>TKey</c>'s version's images can be found.</param>
-	/// <param name="programDirectory">The program directory of the Python executable.</param>
+	/// <param name="pythonVirtualEnvironmentDirectory">Directory where the Python executable resides (Supports virtual environments).</param>
+	/// <param name="scriptDirectory">Directory where the Python impa.py script resides.</param>
 	/// <param name="outputDestination">Specifies the output destination.</param>
 	/// <param name="tessbinPath">Specifies the absolute path of <c>/tessbin/</c> folder. If null, assumes such folder is in the same working directory.</param>
 	/// <param name="coreCount">Specifies the core count manually. Default is dual (2) cores.</param>
 	/// <param name="isDefaultConversion">Specifies if the images supplied are for default conversion.</param>
-	public PythonExecutionFactory(IDictionary<Categories, Collection<int>> weaponIDs, IDictionary<PhantomForcesVersion, string> versionAndPathPairs, string programDirectory, OutputDestination outputDestination, string? tessbinPath, Cores coreCount = Cores.Dual, bool isDefaultConversion = true)
+	public PythonExecutionFactory(IDictionary<Categories, Collection<int>> weaponIDs, IDictionary<PhantomForcesVersion, string> versionAndPathPairs, string pythonVirtualEnvironmentDirectory, string scriptDirectory, OutputDestination outputDestination,  string? tessbinPath, Cores coreCount = Cores.Dual, bool isDefaultConversion = true)
 	{
 		TPythonExecutable pythonExecutable = new();
 		if (Directory.Exists(tessbinPath) == false && tessbinPath != null && pythonExecutable is PythonTesseractExecutable) {
@@ -296,7 +307,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 						continue;
 					}
 					pythonExecutable = new();
-					_constructorHelper(outputDestination, categoryGroup, weapon, versionAndPathPairs[version], version, programDirectory, tessbinPath, pythonExecutable);
+					_constructorHelper(outputDestination, categoryGroup, weapon, versionAndPathPairs[version], version, pythonVirtualEnvironmentDirectory, scriptDirectory, tessbinPath, pythonExecutable);
 				}
 			}
 		}
@@ -392,17 +403,29 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 
 			for (int j = 0; j < _coreCount; j++)
 			{
-				temp.Add(_queue[i * _coreCount + j]);
+				try{
+					temp.Add(_queue[i * _coreCount + j]);
+					QueueStatus.SuccessCounter++;
+				}catch(Exception e){
+					PFDBLogger.LogError(e.Message);
+					QueueStatus.FailCounter++;
+				}
 			}
-			//listOfSmallerQueues.Add(temp.ToList());
-			listOfSmallerQueues.Add([.. temp]);
+			listOfSmallerQueues.Add(temp.ToList());
+			//listOfSmallerQueues.Add([.. temp]);
 		}
 		if (_queue.Count % _coreCount != 0)
 		{
 			List<IPythonExecutor> temp1 = new List<IPythonExecutor>();
 			for (int j = i * _coreCount; j < _queue.Count; ++j)
 			{
-				temp1.Add(_queue[j]);
+				try{
+					temp1.Add(_queue[j]);
+					QueueStatus.SuccessCounter++;
+				}catch(Exception e){
+					PFDBLogger.LogError(e.Message);
+					QueueStatus.FailCounter++;
+				}
 			}
 			listOfSmallerQueues.Add(temp1);
 		}
@@ -414,17 +437,53 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 		DateTime start = DateTime.Now;
 
 		List<IOutput> outputs = new List<IOutput>();
+
+		foreach(List<IPythonExecutor> smallList in listOfSmallerQueues){
+			foreach(IPythonExecutor executor in smallList)
+			try{
+				executor.Execute(null);
+				IOutput executorOutput = executor.Output;
+				if (executorOutput is Benchmark benchmark)
+				{
+					ExecutionStatus.SuccessCounter++;
+					totalParallelTimeElapsedDateTime += benchmark.StopwatchDateTime;
+					totalParallelTimeElapsedInMilliseconds += benchmark.StopwatchNormal.ElapsedMilliseconds;
+				}
+				else if (executorOutput is FailedPythonOutput failedOutput)
+				{
+					ExecutionStatus.FailCounter++;
+					PFDBLogger.LogError($"Execution failed: Execution of the individual Python script failed", parameter: failedOutput.OutputString);
+				}
+				else
+				{
+					ExecutionStatus.SuccessCounter++;
+
+				}
+				outputs.Add(executorOutput);
+			} catch (Exception e)
+			{
+				PFDBLogger.LogWarning($"Execption raised when trying to construct factory: {e}");
+			}
+		}
+
+
+		/*
+		//the following code needs to be improved, i'm sorry, but this is shit
+
+
 		foreach (List<IPythonExecutor> smallList in listOfSmallerQueues)
 		{
 			Task[] tasks = new Task[smallList.Count];
 
 			for (int k = 0; k < smallList.Count; ++k)
 			{
-				/*
+
+				
+				
 				tasks[k] = Task.Factory.StartNew<IOutput>(() => {
 					smallList[k].Execute(null); return smallList[k].Output;
 				});
-				*/
+				
 				//if(tasks[k] == null)Console.WriteLine($"tasks[{k}] was null");
 
 
@@ -436,7 +495,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 					
 
 
-				/*
+				
 					Task.Factory.ContinueWhenAll(tasks,
 						(_) =>
 						{
@@ -464,7 +523,7 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 						}
 					);
 
-				*/
+				
 				}
 				catch (Exception e)
 				{
@@ -476,8 +535,6 @@ public sealed class PythonExecutionFactory<TPythonExecutable> : IPythonExecution
 
 
 
-		/*
-		//the following code needs to be improved, i'm sorry, but this is shit
 
 		for (int currentListIndexInBigList = 0; currentListIndexInBigList < listOfSmallerQueues.Count; ++currentListIndexInBigList)
 		{

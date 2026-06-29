@@ -21,7 +21,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 	private protected WeaponType _weaponType;
 	private protected string _fileDirectory;
 	private protected string _filename;
-	private protected string _programDirectory;
+	private protected string _pythonVirtaulEnvironmentDirectory;
+	private protected string _scriptDirectory;
 	private protected string? _tessbinPath;
 	private protected string _commandExecuted;
 	private protected bool _isDefaultConversion;
@@ -44,7 +45,10 @@ public class PythonTesseractExecutable : IPythonExecutable
 	public WeaponType WeaponType { get { return _weaponType; } }
 
 	/// <inheritdoc/>
-	public string ProgramDirectory { get { return _programDirectory; } }
+	public string PythonVirtualEnvironmentDirectory { get { return _pythonVirtaulEnvironmentDirectory; } }
+
+	/// <inheritdoc/>
+	public string ScriptDirectory {get {return _scriptDirectory;} }
 
 	/// <summary>
 	/// Path to "tessbin" folder. If null, "tessbin" folder is assumed to be in the same working directory.
@@ -65,7 +69,7 @@ public class PythonTesseractExecutable : IPythonExecutable
 
 
 	/// <summary>
-	/// Unused constructor. Use <see cref="Construct(string, string, WeaponIdentification, WeaponType, string, bool)"/> or <see cref="Construct(string, string, WeaponIdentification, WeaponType, string, string?, bool)"/> instead.
+	/// Unused constructor. Use <see cref="Construct(string, string, WeaponIdentification, WeaponType, string, string, bool)"/> or <see cref="Construct(string, string, WeaponIdentification, WeaponType, string, string, string?, bool)"/> instead.
 	/// </summary>
 	public PythonTesseractExecutable()
 	{
@@ -75,7 +79,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 		_WID = new WeaponIdentification(new PhantomForcesVersion(8, 0, 0), 0, 0, 0);
 		_fileDirectory = string.Empty;
 		_filename = string.Empty;
-		_programDirectory = string.Empty;
+		_pythonVirtaulEnvironmentDirectory = string.Empty;
+		_scriptDirectory = string.Empty;
 		_tessbinPath = null;
 		_weaponType = 0;
 		_commandExecuted = string.Empty;
@@ -83,7 +88,7 @@ public class PythonTesseractExecutable : IPythonExecutable
 
 
 	/// <inheritdoc/>
-	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion = true)
+	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string pythonVirtualEnvironmentDirectory, string scriptDirectory, bool isDefaultConversion = true)
 	{
 
         PFDBLogger.LogArguments(new Dictionary<string, object?>(){
@@ -91,7 +96,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 			{nameof(fileDirectory), fileDirectory},
 			{nameof(weaponID), weaponID.ID},
 			{nameof(weaponType), weaponType},
-			{nameof(programDirectory), programDirectory},
+			{nameof(pythonVirtualEnvironmentDirectory), pythonVirtualEnvironmentDirectory},
+			{nameof(scriptDirectory), scriptDirectory},
 			{nameof(isDefaultConversion), isDefaultConversion}
 		});
 		PFDBLogger.LogDebug("PythonTesseractExecutable used constructor called");
@@ -106,9 +112,9 @@ public class PythonTesseractExecutable : IPythonExecutable
 				_tessbinPath += slash;
 			}
 		}
-		if (programDirectory.EndsWith(slash) == false)
+		if (pythonVirtualEnvironmentDirectory.EndsWith(slash) == false)
 		{
-			programDirectory += slash;
+			pythonVirtualEnvironmentDirectory += slash;
 		}
 		if (fileDirectory.EndsWith(slash) == false)
 		{
@@ -116,7 +122,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 		}
 		_fileDirectory = fileDirectory;
 		_WID = weaponID;
-		_programDirectory = programDirectory;
+		_pythonVirtaulEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
+		_scriptDirectory = scriptDirectory;
 		_commandExecuted = string.Empty;
 		_untrustedConstruction = false;
 		return this;
@@ -129,17 +136,19 @@ public class PythonTesseractExecutable : IPythonExecutable
 	/// <param name="fileDirectory">Directory where the images for reading reside.</param>
 	/// <param name="weaponType">WeaponType of the weapon, telling the Python application where to read.</param>
 	/// <param name="weaponID">Phantom Forces weapon identification.</param>
-	/// <param name="programDirectory">Directory where the Python executable resides.</param>
+	/// <param name="pythonVirtualEnvironmentDirectory">Directory where the Python executable resides (Supports virtual environments).</param>
+	/// <param name="scriptDirectory">Directory where the Python impa.py script resides.</param>
 	/// <param name="tessbinPath">Path to "tessbin" folder. If null, "tessbin" folder is assumed to be in the same working directory.</param>
 	/// <param name="isDefaultConversion">Specifies if the images supplied are for default conversion.</param>
-	public PythonTesseractExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, string? tessbinPath, bool isDefaultConversion = true)
+	public PythonTesseractExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string pythonVirtualEnvironmentDirectory, string scriptDirectory, string? tessbinPath, bool isDefaultConversion = true)
 	{
 		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
 			{nameof(filename), filename},
 			{nameof(fileDirectory), fileDirectory},
 			{nameof(weaponID), weaponID.ID},
 			{nameof(weaponType), weaponType},
-			{nameof(programDirectory), programDirectory},
+			{nameof(pythonVirtualEnvironmentDirectory), pythonVirtualEnvironmentDirectory},
+			{nameof(scriptDirectory), scriptDirectory},
 			{nameof(tessbinPath), tessbinPath},
 			{nameof(isDefaultConversion), isDefaultConversion}
 		});
@@ -155,9 +164,9 @@ public class PythonTesseractExecutable : IPythonExecutable
 				_tessbinPath += slash;
 			}
 		}
-		if (programDirectory.EndsWith(slash) == false)
+		if (pythonVirtualEnvironmentDirectory.EndsWith(slash) == false)
 		{
-			programDirectory += slash;
+			pythonVirtualEnvironmentDirectory += slash;
 		}
 		if (fileDirectory.EndsWith(slash) == false)
 		{
@@ -165,7 +174,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 		}
 		_fileDirectory = fileDirectory;
 		_WID = weaponID;
-		_programDirectory = programDirectory;
+		_pythonVirtaulEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
+		_scriptDirectory = scriptDirectory;
 		_commandExecuted = string.Empty;
 		_untrustedConstruction = false;
 		return this;
@@ -179,20 +189,22 @@ public class PythonTesseractExecutable : IPythonExecutable
 		StringBuilder command = new StringBuilder("Command used: ");
 		if (TessbinPath == null)
 		{
-			pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), $"-c {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
+			pyexecute = new ProcessStartInfo("./python" , $"{_scriptDirectory}{slash}impa.py -c {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
 			command.Append(pyexecute.Arguments);
 			command = command.Replace(FileDirectory + Filename, "...." + PyUtilityClass.CommonExecutionPath(Directory.GetCurrentDirectory() ?? "null", FileDirectory + Filename).relativeForeignPath);
 		}
 		else
 		{
-			pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), $"-f {TessbinPath} {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
+			pyexecute = new ProcessStartInfo("./python" , $"{_scriptDirectory}{slash}impa -f {TessbinPath} {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
 			command.Append(pyexecute.Arguments);
 			command = command.Replace(TessbinPath, "...." + PyUtilityClass.CommonExecutionPath(Directory.GetCurrentDirectory() ?? "null", TessbinPath).relativeForeignPath);
 		}
 		_commandExecuted = command.ToString();
+		pyexecute.WorkingDirectory = PythonVirtualEnvironmentDirectory;
 		pyexecute.RedirectStandardOutput = true;
 		pyexecute.RedirectStandardError = true;
 		pyexecute.UseShellExecute = false;
+		PFDBLogger.LogDebug($"Working Directory: {PythonVirtualEnvironmentDirectory}, Arguments: {command.ToString()}");
 		return pyexecute;
 	}
 
@@ -227,10 +239,10 @@ public class PythonTesseractExecutable : IPythonExecutable
 				aggregateException.exceptions.Add(new DirectoryNotFoundException($"The tessbin path specified at {TessbinPath}tessbin{slash} does not exist. Ensure that the directory exists, then try again."));
 			}
 		}
-		if ((File.Exists(ProgramDirectory + "impa.exe") == false && _isWindows) || (File.Exists(ProgramDirectory + "impa") == false && _isLinux))
+		if ((File.Exists(PythonVirtualEnvironmentDirectory + "impa.exe") == false && _isWindows) || (File.Exists(PythonVirtualEnvironmentDirectory + "impa") == false && _isLinux))
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it
-			aggregateException.exceptions.Add(new FileNotFoundException($"The application file, specified at {ProgramDirectory + "impa.exe"} does not exist."));
+			aggregateException.exceptions.Add(new FileNotFoundException($"The application file, specified at {PythonVirtualEnvironmentDirectory + "impa.exe"} does not exist."));
 		}
 		if (!File.Exists(FileDirectory + Filename))
 		{

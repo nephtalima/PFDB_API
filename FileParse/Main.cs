@@ -34,9 +34,10 @@ public static class ParseTesting {
     /// <summary>
     /// Main testing function.
     /// </summary>
-    /// <param name="acceptableSpaces"></param>
-    /// <param name="acceptableCorruptedWordSpaces">Specifies the number of </param>
-    /// <param name="stringComparisonMethod"></param>
+    /// <returns>True if all the tests pass, false otherwise.</returns>
+    /// <param name="acceptableSpaces">Specifies the acceptable number spaces between both words.</param>
+    /// <param name="acceptableCorruptedWordSpaces">Specifies the acceptable number spaces that a corrupted word can have.</param>
+    /// <param name="stringComparisonMethod">Specifies the StringComparison method to be used.</param>
     public static bool Test(int acceptableSpaces, int acceptableCorruptedWordSpaces, StringComparison stringComparisonMethod /*= StringComparison.InvariantCultureIgnoreCase*/)
     {
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {

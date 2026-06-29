@@ -22,9 +22,14 @@ public interface IPythonExecutable
 	public bool IsDefaultConversion { get; }
 
 	/// <summary>
-	/// Directory where the Python executable resides
+	/// Directory where the Python executable resides.
 	/// </summary>
-	public string ProgramDirectory { get; }
+	public string PythonVirtualEnvironmentDirectory { get; }
+
+	/// <summary>
+	/// Directory where the Python impa.py script resides.
+	/// </summary>
+	public string ScriptDirectory {get; }
 
 	/// <summary>
 	/// The unique weapon identifier for the weapon being processed.
@@ -43,7 +48,7 @@ public interface IPythonExecutable
 	public ProcessStartInfo GetProcessStartInfo();
 
 	/// <summary>
-	/// Checks if the parameters passed through <see cref="IPythonExecutable.Construct(string, string, WeaponIdentification, WeaponType, string, bool)"/> are valid. Throws any one of the following errors if the parameters are invalid.
+	/// Checks if the parameters passed through <see cref="IPythonExecutable.Construct(string, string, WeaponIdentification, WeaponType, string, string, bool)"/> are valid. Throws any one of the following errors if the parameters are invalid.
 	/// </summary>
 	/// <exception cref="ArgumentException"></exception>
 	/// <exception cref="FileNotFoundException"></exception>
@@ -64,8 +69,9 @@ public interface IPythonExecutable
 	/// <param name="fileDirectory">Directory where the images for reading reside.</param>
 	/// <param name="weaponType">WeaponType of the weapon, telling the Python application where to read.</param>
 	/// <param name="weaponID">Phantom Forces weapon identification.</param>
-	/// <param name="programDirectory">Directory where the Python executable resides.</param>
+	/// <param name="pythonVirtualEnvironmentDirectory">Directory where the Python executable resides.</param>
+	/// <param name="scriptDirectory">Directory where the Python impa.py script resides.</param>
 	/// <param name="isDefaultConversion">Specifies if the images supplied are for default conversion.</param>
 	/// <returns>A reference to this class for use in anything inheriting from <see cref="IPythonExecutor"/>.</returns>
-	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion = true);
+	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string pythonVirtualEnvironmentDirectory, string scriptDirectory, bool isDefaultConversion = true);
 }

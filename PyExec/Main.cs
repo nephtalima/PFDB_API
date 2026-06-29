@@ -56,10 +56,11 @@ public static class PythonTest
     /// <summary>
     /// Main testing function.
     /// </summary>
-    public static bool Test(string pythonProgramPath, string imageBasePath, string? tessbinPath)
+    /// <returns>True if all the tests pass, false otherwise.</returns>
+    public static bool Test(string pythonVirtualEnvironment, string imageBasePath, string scriptDirectory, string? tessbinPath)
     {
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
-            {nameof(pythonProgramPath), pythonProgramPath},
+            {nameof(pythonVirtualEnvironment), pythonVirtualEnvironment},
             {nameof(imageBasePath), imageBasePath},
             {nameof(tessbinPath), tessbinPath}
 		});
@@ -67,7 +68,7 @@ public static class PythonTest
         if (WeaponTable.InitializeEverything().success == false) return false;
 
         PFDBLogger.LogInformation("");
-        PFDBLogger.LogInformation($"\u001b[1;36mStarting Python testing. (parameters: pythonProgramPath: {pythonProgramPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath})\u001b[0;0m");
+        PFDBLogger.LogInformation($"\u001b[1;36mStarting Python testing. (parameters: pythonProgramPath: {pythonVirtualEnvironment}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath})\u001b[0;0m");
         PFDBLogger.LogInformation("");
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
@@ -80,16 +81,16 @@ public static class PythonTest
         if (PythonExecutorInitExecutableFileTest()) score++;
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
-        if (PythonTesseractExecutableTest(tessbinPath)) score++;
+        if (PythonTesseractExecutableTest(pythonVirtualEnvironment, scriptDirectory, tessbinPath)) score++;
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
-        if (PythonExecutionFactoryMockedTest(pythonProgramPath, imageBasePath)) score++;
+        if (PythonExecutionFactoryMockedTest(pythonVirtualEnvironment, imageBasePath, scriptDirectory)) score++;
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
-        if (PythonExecutionFactoryEmptyTest(pythonProgramPath, imageBasePath, tessbinPath)) score++;
+        if (PythonExecutionFactoryEmptyTest(pythonVirtualEnvironment, imageBasePath, scriptDirectory, tessbinPath)) score++;
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
-        if (PythonExecutionFactoryTesseractTest(pythonProgramPath, imageBasePath, tessbinPath)) score++;
+        if (PythonExecutionFactoryTesseractTest(pythonVirtualEnvironment, imageBasePath, scriptDirectory, tessbinPath)) score++;
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
         bool pass = TestingOutput("All PyExec tests", score >= 6, "6", score.ToString());
@@ -103,7 +104,7 @@ public static class PythonTest
     /// Tests if <see cref="PythonExecutionFactory{InitPythonExecutable}"/> can find files and properly execute them.
     /// </summary>
     /// <returns>Whether this tests passes.</returns>
-    public static bool PythonExecutionFactoryTesseractTest(string pythonProgramPath, string imageBasePath, string? tessbinPath)
+    public static bool PythonExecutionFactoryTesseractTest(string pythonProgramPath, string imageBasePath, string scriptDirectory, string? tessbinPath)
     {
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
             {nameof(pythonProgramPath), pythonProgramPath},
@@ -136,7 +137,7 @@ public static class PythonTest
             new PythonExecutionFactory<PythonTesseractExecutable>(
                 new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>>(){
                     {version1001, weaponNumbers}
-                }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, tessbinPath);
+                }, versionAndPathPairs, pythonProgramPath, scriptDirectory, OutputDestination.Console, tessbinPath);
         IPythonExecutionFactoryOutput output = factory.Start();
         Console.WriteLine(output.QueueStatusCounter.SuccessCounter);
         
@@ -157,7 +158,7 @@ public static class PythonTest
     /// Tests if <see cref="PythonExecutionFactory{InitExecutable}"/> can detect if we give it an empty list.
     /// </summary>
     /// <returns>Whether this tests passes.</returns>
-    public static bool PythonExecutionFactoryEmptyTest(string pythonProgramPath, string imageBasePath, string? tessbinPath)
+    public static bool PythonExecutionFactoryEmptyTest(string pythonProgramPath, string imageBasePath, string scriptDirectory, string? tessbinPath)
     {
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
             {nameof(pythonProgramPath), pythonProgramPath},
@@ -176,7 +177,7 @@ public static class PythonTest
             new PythonExecutionFactory<PythonTesseractExecutable>(
                 new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>>(){
                     {version1001, weaponNumbers}
-                }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, tessbinPath);
+                }, versionAndPathPairs, pythonProgramPath, scriptDirectory, OutputDestination.Console, tessbinPath);
         IPythonExecutionFactoryOutput output = factory.Start();
         int fails = output.QueueStatusCounter.FailCounter;
         return TestingOutput("Python execution factory test (queueing, checking, executing)", fails == 1, "1", fails.ToString());
@@ -186,7 +187,7 @@ public static class PythonTest
     /// Tests if <see cref="PythonExecutionFactory{InitPythonExecutable}"/> can find files and properly execute them.
     /// </summary>
     /// <returns>Whether this tests passes.</returns>
-    public static bool PythonExecutionFactoryMockedTest(string pythonProgramPath, string imageBasePath)
+    public static bool PythonExecutionFactoryMockedTest(string pythonProgramPath, string imageBasePath, string scriptDirectory)
     {
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
             {nameof(pythonProgramPath), pythonProgramPath},
@@ -224,7 +225,7 @@ public static class PythonTest
             new PythonExecutionFactory<InitExecutable>(
                 new Dictionary<PhantomForcesVersion, Dictionary<Categories, List<int>>>(){
                     {version1001, weaponNumbers}
-                }, versionAndPathPairs, pythonProgramPath, OutputDestination.Console, null);
+                }, versionAndPathPairs, pythonProgramPath, scriptDirectory, OutputDestination.Console, null);
         IPythonExecutionFactoryOutput output = factory.Start();
 
 		if (output.MissingFiles.Count() > 0)
@@ -294,7 +295,7 @@ public static class PythonTest
     /// Tests if <see cref="PythonTesseractExecutable"/> is able to read from an image file, correctly read it, and write the output to a new file.
     /// </summary>
     /// <returns>Whether this test passes.</returns>
-    public static bool PythonTesseractExecutableTest(string? tessbinPath)
+    public static bool PythonTesseractExecutableTest(string pythonProgramPath, string scriptDirectory, string? tessbinPath)
     {
 
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
@@ -306,7 +307,7 @@ public static class PythonTest
         PythonTesseractExecutable executable = new PythonTesseractExecutable();
         executable.Construct(fileName, Directory.GetCurrentDirectory(),
             new WeaponUtility.WeaponIdentification(new PhantomForcesVersion("10.1.0"), Categories.AssaultRifles, 15, 0, "AS-VAL"),
-            WeaponType.Primary, Directory.GetCurrentDirectory(), tessbinPath
+            WeaponType.Primary, pythonProgramPath, scriptDirectory, tessbinPath
             );
         executor.Load(executable);
         PFDBLogger.LogInformation("Executing, this may take a while...");
