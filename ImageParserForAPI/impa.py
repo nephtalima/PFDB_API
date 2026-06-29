@@ -1,7 +1,4 @@
 import sys
-sys.path.append('C:\\Users\\Aethelhelm\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages')
-sys.path.append('C:\\Users\\Aethelhelm\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages')
-sys.path.append('/mnt/bulkdata/Programming/PFDB/PFDB_API/lib/python3.12/site-packages')
 
 import numpy
 import cv2
@@ -419,7 +416,7 @@ def commandParser():
 		print("i force fed myself olives for a month, i hated it, but now i love olives")
 		return
 	
-	if commandFound(sys.argv[1], "--help") or commandFound(sys.argv[1], "-h"):
+	if commandFound(sys.argv[1], "--help") or commandFound(sys.argv[1], "-h") or commandFound(sys.argv[1], "help"):
 		print("""
 Image Parser for Phantom Forces Database
 COMMAND USAGE: impa [OPTIONS] {TESSBINPATH} FILEPATH TYPE VERSION ()
@@ -427,10 +424,10 @@ COMMAND USAGE: impa [OPTIONS] {TESSBINPATH} FILEPATH TYPE VERSION ()
 OPTIONS:
 	-h  --help  Displays this help message, and exits
 	-c          Tessbin folder exists in the current working directory (TESSBINPATH is ignored)
-	#-f          Tessbin folder exists in another directory (specified by TESSBINPATH)
+	-f          Tessbin folder exists in another directory (specified by TESSBINPATH)
 	#-w			
 
-	NOTE: -c and -a are mutually exclusive; you cannot use both at the same time.
+	NOTE: -c and -f are mutually exclusive; you cannot use both at the same time.
 		
 TESSBINPATH: path to /tessbin/ (important for pytesseract). ignored if -c flag is specified
 
@@ -473,7 +470,7 @@ VERSION: specifies the version of Phantom Forces
 			print("Too many parameters. Expected 4: impa [OPTIONS] FILEPATH TYPE VERSION")
 		else:
 			print("Too few parameters. Expected 4: impa [OPTIONS] FILEPATH TYPE VERSION")
-	else:
+	elif commandFound(sys.argv[1], "f"):
 		if len(sys.argv) == 6: #valid
 			tessbinpath = sys.argv[2]
 			filepath = sys.argv[3]
