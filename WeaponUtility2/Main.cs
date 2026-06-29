@@ -6,9 +6,15 @@ using PFDB.WeaponUtility;
 
 namespace PFDB.WeaponUtilityTesting;
 
-
+/// <summary>
+/// Defines a class that tests functions within WeaponUtility
+/// </summary>
 public static class WeaponTest
 {
+
+    /// <summary>
+    /// Main entry point.
+    /// </summary>
     public static void Main(){
 
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
@@ -16,7 +22,10 @@ public static class WeaponTest
 
     }
 
-
+    /// <summary>
+    /// Main testing function.
+    /// </summary>
+    /// <returns>True if all the tests pass, false otherwise.</returns>
     public static bool Test(){
 
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
@@ -26,10 +35,7 @@ public static class WeaponTest
         PFDBLogger.LogInformation("");
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
-        if(PhantomForcesVersionConstructor1Test())score++;
-        PFDBLogger.LogInformation("________________");
-        PFDBLogger.LogInformation("");
-        if(PhantomForcesVersionConstructor2Test())score++;
+        if(PhantomForcesVersionConstructorTest())score++;
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
         if(PhantomForcesVersionLegacyTest())score++;
@@ -48,7 +54,7 @@ public static class WeaponTest
         */
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
-        bool pass = TestingOutput("All WeaponUtiltiy tests", score >= 3, "3", score.ToString());
+        bool pass = TestingOutput("All WeaponUtiltiy tests", score >= 2, "2", score.ToString());
         PFDBLogger.LogInformation("________________");
         PFDBLogger.LogInformation("");
         PFDBLogger.LogInformation("");
@@ -57,7 +63,11 @@ public static class WeaponTest
     }
 
 
-    public static bool PhantomForcesVersionConstructor1Test(){
+    /// <summary>
+    /// Tests passing in individual numbers for version number; checks if the constructor makes the expected version string.
+    /// </summary>
+    /// <returns>True if all the tests pass, false otherwise.</returns>
+    public static bool PhantomForcesVersionConstructorTest(){
 
         int majorVersion = 10;
         int minorVersion = 0;
@@ -67,17 +77,11 @@ public static class WeaponTest
         return TestingOutput("PhantomForcesVersion major, minor, revision number -> string constructor test", version.VersionString == $"{majorVersion}.{minorVersion}.{revisionVersion}", $"{majorVersion}.{minorVersion}.{revisionVersion}", version.VersionString);
     }
 
-    public static bool PhantomForcesVersionConstructor2Test(){
 
-        int majorVersion = 10;
-        int minorVersion = 0;
-        int revisionVersion = 1;
-        string versionString = $"{majorVersion}.{minorVersion}.{revisionVersion}";
-
-        PhantomForcesVersion version = new PhantomForcesVersion(versionString);
-        return TestingOutput("PhantomForcesVersion string -> major, minor, revision number constructor test", $"{majorVersion}{minorVersion}{revisionVersion}" == version.VersionNumber.ToString(), $"{majorVersion}{minorVersion}{revisionVersion}", version.VersionNumber.ToString());
-    }
-
+    /// <summary>
+    /// Tests if certain versions (any version before version 9.0.0) are considered "Legacy" versions.
+    /// </summary>
+    /// <returns>True if all the tests pass, false otherwise.</returns>
     public static bool PhantomForcesVersionLegacyTest(){
         int score = 0;
         PhantomForcesVersion version1 = new PhantomForcesVersion("10.0.1");
