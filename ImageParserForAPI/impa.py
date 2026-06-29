@@ -5,6 +5,8 @@ import cv2
 import pytesseract
 import os
 
+
+tempImageDirectory = "pythoncvtes ting/"
 #todo: add option to have many small images or one big image
 #also, add comments to save my sanity every time i open this file
 
@@ -36,7 +38,7 @@ def categoryWeaponCrop(imagePath, weaponType, version):
 				continue
 			else:
 				print(fi + "saved!")
-				cv2.imwrite(fi, crop)
+				cv2.imwrite(tempImageDirectory + fi, crop)
 				break
 	#cv2.imwrite("")
 
@@ -294,17 +296,22 @@ class ImageParser:
 			image = cv2.imread(image)
 		if image.size == 0:
 			return "[OCR] Empty Image" #uh oh
+
+		# Convert to black&white image
+
 		bw		= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 		resize	= bw
 
 		
+
 		if cropname != "bigcrop" and cropname != "DamageAdvanced" and cropname != "DamageInfo": #if this isn't bigcrop, scale it
 			dim			= (int(bw.shape[0] * (self.resize_scale + 4)), int(bw.shape[1] * (self.resize_scale)))
 			resize		= cv2.resize(bw, dim, interpolation=cv2.INTER_AREA)
 		#elif cropname == "DamageAdvanced" or cropname == "DamageInfo":
 			#dim			= (int(bw.shape[0] * (self.resize_scale+30)), int(bw.shape[1] * self.resize_scale))
 			#resize		= cv2.resize(bw, dim, interpolation=cv2.INTER_AREA)
-			##### PREPROCESSING
+			
+		# this block below was copied from StackOverflow many years ago and I have no idea what it does exactly but it works
 
 		#process = unsharp_mask(resize)
 		process1		= cv2.cvtColor( resize, cv2.COLOR_GRAY2BGR)
@@ -321,28 +328,30 @@ class ImageParser:
 		enhanced_img	= cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
 		process2		= cv2.cvtColor(enhanced_img, cv2.COLOR_BGR2GRAY)
 		sharpened_img	= cv2.bilateralFilter(process2,9,75,75)
-		im_bw	= cv2.threshold(sharpened_img, 140, 255, cv2.THRESH_BINARY )[1]
+		im_bw			= cv2.threshold(sharpened_img, 140, 255, cv2.THRESH_BINARY )[1]
 		eroded			= thinFontPreprocessing(im_bw)
-		filename = "pythoncvtesting/" + cropname + version + "_eroded.png"
-		filename2 = "pythoncvtesting/" + cropname + version + "_sharpened.png"
-		filename3 = "pythoncvtesting/" + cropname + version + "_monotone.png"
+
+
+		filename = tempImageDirectory + cropname + version + "_eroded.png"
+		filename2 = tempImageDirectory + cropname + version + "_sharpened.png"
+		filename3 = tempImageDirectory + cropname + version + "_monotone.png"
 		cv2.imwrite(filename, eroded)
 		cv2.imwrite(filename2,sharpened_img)
 		cv2.imwrite(filename3, im_bw)
 		
-		rois = []
+		damageRangeNumberIndices = []
 		if cropname == "DamageInfo" or cropname == "DamageAdvanced":
 			
-			cv2.imwrite("temp.png", im_bw)
+			cv2.imwrite(tempImageDirectory + "pythontemp.png", im_bw)
 			tempimage = cv2.imread("temp.png")#thinFontPreprocessing(enhanced_img)
 			
 			gray			= cv2.cvtColor(tempimage, cv2.COLOR_BGR2GRAY)
 			blur			= cv2.GaussianBlur(gray, (7,7), 0)
-			a = "pythoncvtesting/index_blur_" + cropname + version + ".png"
+			a = tempImageDirectory + "index_blur_" + cropname + version + ".png"
 			cv2.imwrite(a, blur)
 		
 			threshold		= cv2.threshold(blur, 150, 255,  cv2.THRESH_OTSU)[1]
-			a = "pythoncvtesting/index_threshold_" + cropname + version + ".png"
+			a = tempImageDirectory + "index_threshold_" + cropname + version + ".png"
 			cv2.imwrite(a, threshold)
 		
 			kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (6,2))
@@ -350,36 +359,37 @@ class ImageParser:
 				kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (8,2)) #big version is around 56, 16
 			else:
 				kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (4,2)) #big version is around 56, 16
-			a = "pythoncvtesting/index_kernal_" + cropname + version + ".png"
+			a = tempImageDirectory + "index_kernal_" + cropname + version + ".png"
 			cv2.imwrite(a, kernal)
 		
 			
 			dilate = cv2.dilate(threshold, kernal, iterations=1)
-			a = "pythoncvtesting/index_dilate_" + cropname + version + ".png"
+			a = tempImageDirectory + "index_dilate_" + cropname + version + ".png"
 			cv2.imwrite(a, dilate)
 
 			counter  = 0
-			cnts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-			cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-			cnts = sorted(cnts, key=lambda x: cv2.boundingRect(x)[0])
-			for c in cnts:
+			counts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+			counts = counts[0] if len(counts) == 2 else counts[1]
+			counts = sorted(counts, key=lambda x: cv2.boundingRect(x)[0])
+			for c in counts:
 				x, y, w, h, = cv2.boundingRect(c)
 				if w > 10 or h > 12:
 					#threshold2 = cv2.threshold(sharpened_img, 120, 255, cv2.THRESH_BINARY_INV)[1]
 					#cv2.imwrite("temp2.png", threshold2)
 					#inp = cv2.imread("temp2.png")
-					bufferstarty = y-roi_buffer
-					bufferstartx = x-roi_buffer
-					bufferendy = y+h+roi_buffer
-					bufferendx = x+w+roi_buffer
+					bufferstarty = y - roi_buffer
+					bufferstartx = x - roi_buffer
+					bufferendy = y + h + roi_buffer
+					bufferendx = x + w + roi_buffer
 					if bufferstartx < 0: bufferstartx = 0
 					if bufferstarty < 0: bufferstarty = 0
-					rois.append((counter,sharpened_img[bufferstarty:bufferendy , bufferstartx:bufferendx]))
-					fi = "pythoncvtesting/index_roi_" + str(counter) + "_" + cropname + version + ".png"
-					cv2.imwrite(fi, rois[counter][1])
+
+					damageRangeNumberIndices.append((counter,sharpened_img[bufferstarty:bufferendy , bufferstartx:bufferendx]))
+					damageRangeNumberFile = tempImageDirectory + "index_roi_" + str(counter) + "_" + cropname + version + ".png"
+					cv2.imwrite(damageRangeNumberFile, damageRangeNumberIndices[counter][1])
 					counter = counter + 1
 					cv2.rectangle(tempimage, (x,y), (x+w,y+h), (36, 255, 12), 2)
-			a = "pythoncvtesting/index_bbox_" + cropname + version + ".png"
+			a = tempImageDirectory + "index_bbox_" + cropname + version + ".png"
 			cv2.imwrite(a, tempimage)
 			
 
@@ -389,7 +399,7 @@ class ImageParser:
 			return pytesseract.image_to_string(eroded, config="--psm 6") # (1 or 4) and 6 seem to work best atm
 		elif cropname == "DamageInfo" or cropname == "DamageAdvanced":
 			data = ""
-			for roi in rois:
+			for roi in damageRangeNumberIndices:
 				data += ("index " + str(roi[0]) + ": ")
 				data += pytesseract.image_to_string(roi[1], config="--psm 7")
 			return data
