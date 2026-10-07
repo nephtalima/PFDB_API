@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using PFDB.Logging;
 
 namespace PFDB;
 
@@ -21,6 +22,8 @@ public sealed class PythonAggregateException : SystemException
 	/// </summary>
 	public PythonAggregateException()
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		Message = "Multiple errors occured";
 		exceptions = new List<SystemException>();
 	}
@@ -31,6 +34,10 @@ public sealed class PythonAggregateException : SystemException
 	/// <param name="message">The error message.</param>
 	public PythonAggregateException(string message) : base(message)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(message), message}
+		});
 		exceptions = new List<SystemException>();
 		Message = message;
 	}
@@ -42,6 +49,11 @@ public sealed class PythonAggregateException : SystemException
 	/// <param name="innerException">The encapsulated exception.</param>
 	public PythonAggregateException(string message, Exception innerException) : base(message, innerException)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+			{nameof(message), message},
+			{nameof(innerException), innerException}
+		});
 		exceptions = new List<SystemException>();
 		Message = message;
 	}

@@ -1,5 +1,7 @@
 ﻿using PFDB.Parsing;
 using System;
+using System.Collections.Generic;
+using PFDB.Logging;
 using PFDB.StatisticStructure;
 using PFDB.WeaponUtility;
 using PFDB.ConversionUtility;
@@ -36,6 +38,10 @@ public class Conversion : IConversion
 	/// <param name="statisticCollection">A collection of statistics for the current conversion.</param>
 	public Conversion(IStatisticCollection statisticCollection)
 	{
+
+		PFDBLogger.LogArguments(new Dictionary<string, object?>() {
+            {nameof(statisticCollection), statisticCollection}
+		});
 		_statisticCollection = statisticCollection;
 		_WID = statisticCollection.WeaponID;
 	}
@@ -48,6 +54,11 @@ public class Conversion : IConversion
 	/// <param name="weaponID">Unique weapon identifier for the weapon that contains the conversion.</param>
 	public Conversion(string filepath, WeaponIdentification weaponID)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(filepath), filepath},
+			{nameof(weaponID), weaponID.ID}
+		});
+
 		_WID = weaponID;
 		IFileParse fileToBeParsed = new FileParse(weaponID);
 		fileToBeParsed.FileReader(filepath);
@@ -63,6 +74,9 @@ public class Conversion : IConversion
 	/// <param name="pythonExecutor"></param>
 	public Conversion(IPythonExecutor pythonExecutor)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(pythonExecutor), pythonExecutor}
+		});
 		_WID = pythonExecutor.Input.WeaponID;
 		if (pythonExecutor.HasExecuted == false) pythonExecutor.Execute(null);
 		IFileParse fileToBeParsed = new FileParse(_WID, pythonExecutor.Output.ToString());

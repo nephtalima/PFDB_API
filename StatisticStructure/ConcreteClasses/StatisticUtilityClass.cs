@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PFDB.Logging;
 
 namespace PFDB.StatisticUtility;
 
@@ -18,6 +19,10 @@ public static class StatisticUtilityClass
 	/// <returns>A list of statistic options for the specified weapon type.</returns>
 	public static IEnumerable<StatisticOptions> GetSearchTargetsForWeapon(WeaponType weaponType)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weaponType), weaponType}
+		});
 		List<StatisticOptions> searchTargets = new List<StatisticOptions>();
 
 		switch (weaponType)

@@ -40,9 +40,16 @@ public sealed class StatisticParse : IStatisticParse
 	/// <param name="text">The text to search through</param>
 	/// <param name="acceptableSpaces">Specifies the acceptable number spaces between words. Default is set to 3.</param>
 	/// <param name="acceptableCorruptedWordSpaces">Specifies the acceptable number spaces that a corrupted word can have. Default is set to 3.</param>
-	/// <param name="consoleWrite"></param>
+	/// <param name="consoleWrite">Whether to write to the console.</param>
 	public StatisticParse(WeaponIdentification weaponID, string text, int acceptableSpaces = 3, int acceptableCorruptedWordSpaces = 3, bool consoleWrite = false)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weaponID), weaponID},
+			{nameof(text), text},
+			{nameof(acceptableSpaces), acceptableSpaces},
+			{nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces},
+			{nameof(consoleWrite), consoleWrite}
+		});
 
 		_WID = weaponID;
 		_consoleWrite = consoleWrite;

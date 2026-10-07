@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using PFDB.Logging;
 
 namespace PFDB.Parsing;
 
@@ -32,6 +33,13 @@ public sealed class IndexSearch : IIndexSearch
 	/// <param name="searchAutomatically">Specifies whether to search immediately after creation. True by default.</param>
 	public IndexSearch(string text, string? word, bool searchAutomatically = true)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(text), text},
+			{nameof(word), word},
+			{nameof(searchAutomatically), searchAutomatically}
+		});
+
 		ListOfIndices = new List<int>();
 		Text = text;
 		Word = word;
@@ -48,6 +56,13 @@ public sealed class IndexSearch : IIndexSearch
 	/// <param name="searchAutomatically">Specifies whether to search immediately after creation. True by default.</param>
 	public IndexSearch(string text, string? word, StringComparison stringComparisonMethod, bool searchAutomatically = true)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(text), text},
+			{nameof(word), word},
+			{nameof(stringComparisonMethod), stringComparisonMethod},
+			{nameof(searchAutomatically), searchAutomatically}
+		});
 		ListOfIndices = new List<int>();
 		Text = text;
 		Word = word;
@@ -64,6 +79,11 @@ public sealed class IndexSearch : IIndexSearch
 	/// <inheritdoc/>
 	public void RemoveFromList(IEnumerable<int> list)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(list), list}
+		});
+
 		ListOfIndices = ListOfIndices.Except(list).ToList();
 
 	}

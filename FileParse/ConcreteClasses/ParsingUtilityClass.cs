@@ -1,4 +1,5 @@
-﻿using PFDB.WeaponUtility;
+﻿using PFDB.Logging;
+using PFDB.WeaponUtility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ public static class ParsingUtilityClass
 	/// <returns>A list of search targets for the specified weapon type.</returns>
 	public static IEnumerable<SearchTargets> GetSearchTargetsForWeapon(WeaponType weaponType)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>()
+		{
+			{nameof(weaponType), weaponType}
+		});
+
 		List<SearchTargets> searchTargets = new List<SearchTargets>();
 
 		switch(weaponType)

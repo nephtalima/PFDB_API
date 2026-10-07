@@ -41,6 +41,9 @@ public class StatisticCollection : List<IStatistic>, IStatisticCollection
 	/// <inheritdoc/>
 	public new void Add(IStatistic statistic)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(statistic), statistic}
+		});
 		if (statistic.WeaponID != _WID)
 		{
 			PFDBLogger.LogError($"Cannot add IStatistic object to StatisticCollection. Version numbers are invalid. StatisticCollection version: {_WID.Version.VersionString}, IStatistic version: {statistic.WeaponID.Version.VersionString}", parameter: statistic);
@@ -52,6 +55,10 @@ public class StatisticCollection : List<IStatistic>, IStatisticCollection
 
 	/// <inheritdoc/>
 	public new void AddRange(IEnumerable<IStatistic> statistics) {
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(statistics), statistics}
+		});
 		if (statistics.Any(x => x.WeaponID != this._WID))
 		{
 			PFDBLogger.LogError($"Cannot add IStatistic objects to StatisticCollection. Version numbers are invalid. StatisticCollection version: {_WID.Version.VersionString}, IStatistic version: {statistics.First().WeaponID.Version.VersionString}");
@@ -77,6 +84,10 @@ public class StatisticCollection : List<IStatistic>, IStatisticCollection
 	/// </summary>
 	/// <param name="weaponID">The unique weapon identifier for the collection.</param>
 	public StatisticCollection(WeaponIdentification weaponID) : base() {
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weaponID), weaponID.ID}
+		});
 		_WID = weaponID;
 	}
 
@@ -86,6 +97,11 @@ public class StatisticCollection : List<IStatistic>, IStatisticCollection
 	/// <param name="weaponID">The unique weapon identifier for the collection.</param>
 	/// <param name="capacity">The specified size of the collection.</param>
 	public StatisticCollection(WeaponIdentification weaponID, int capacity) : base(capacity) {
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weaponID), weaponID.ID},
+			{nameof(capacity), capacity}
+		});
 		_WID = weaponID;
 	}
 
@@ -95,6 +111,11 @@ public class StatisticCollection : List<IStatistic>, IStatisticCollection
 	/// <param name="weaponID">The unique weapon identifier for the collection.</param>
 	/// <param name="collection">The initial collection to initialize for the the current collection.</param>
 	public StatisticCollection(WeaponIdentification weaponID, IEnumerable<IStatistic> collection) : base(collection) {
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weaponID), weaponID.ID},
+			{nameof(collection), collection}
+		});
 		_WID = weaponID;
 	}
 

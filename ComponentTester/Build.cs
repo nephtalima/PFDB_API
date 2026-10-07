@@ -1,10 +1,12 @@
+using System.IO;
+using System.Collections.Generic;
 using PFDB.PythonExecution;
 using PFDB.PythonFactory;
 using PFDB.PythonFactoryUtility;
 using PFDB.Logging;
 using PFDB.WeaponUtility;
-using static PFDB.WeaponUtility.WeaponUtilityClass;
 using PFDB.SQLite;
+using static PFDB.WeaponUtility.WeaponUtilityClass;
 
 namespace PFDB;
 
@@ -12,10 +14,10 @@ public static class Build
 {
 	//public static IEnumerable<uint> RequiredNumberOfParameters { get; } = new List<uint> { 3, 4 };
 
-	public static void BuildVersion(PhantomForcesVersion version, string? pythonProgramPath, string? imageBasePath, string? tessbinPath)
+	public static void BuildVersion(PhantomForcesVersion version, string? pythonVirtualEnvironmentDirectory, string? imageBasePath, string? scriptDirectory, string? tessbinPath)
 	{
 		if (imageBasePath == null) imageBasePath = Directory.GetCurrentDirectory();
-		if (pythonProgramPath == null) pythonProgramPath = Directory.GetCurrentDirectory();
+		if (pythonVirtualEnvironmentDirectory == null) pythonVirtualEnvironmentDirectory = Directory.GetCurrentDirectory();
 
 		WeaponTable.InitializeEverything();
 
@@ -34,7 +36,8 @@ public static class Build
 				{version, weaponNumbers}
 			},
 			versionAndPathPairs: versionAndPathPairs,
-			programDirectory: pythonProgramPath,
+			pythonVirtualEnvironmentDirectory: pythonVirtualEnvironmentDirectory,
+			scriptDirectory: scriptDirectory ?? Directory.GetCurrentDirectory(),
 			outputDestination: PythonExecutionUtility.OutputDestination.Console | PythonExecutionUtility.OutputDestination.File,
 			tessbinPath: tessbinPath
 		);
@@ -52,10 +55,10 @@ public static class Build
 
 	}
 
-	public static void BuildAllVersions(string? pythonProgramPath, string? imageBasePath, string? tessbinPath)
+	public static void BuildAllVersions(string? pythonVirtualEnvironmentDirectory, string? imageBasePath, string? scriptDirectory, string? tessbinPath)
 	{
 		if (imageBasePath == null) imageBasePath = Directory.GetCurrentDirectory();
-		if (pythonProgramPath == null) pythonProgramPath = Directory.GetCurrentDirectory();
+		if (pythonVirtualEnvironmentDirectory == null) pythonVirtualEnvironmentDirectory = Directory.GetCurrentDirectory();
 
 		WeaponTable.InitializeEverything();
 
@@ -76,7 +79,8 @@ public static class Build
 		PythonExecutionFactory<PythonTesseractExecutable> factory = new PythonExecutionFactory<PythonTesseractExecutable>(
 			weaponNumbers: weaponNumbersForEveryCategoryOfEveryVersion,
 			versionAndPathPairs: versionAndPathPairs,
-			programDirectory: pythonProgramPath,
+			pythonVirtualEnvironmentDirectory: pythonVirtualEnvironmentDirectory,
+			scriptDirectory: scriptDirectory ?? Directory.GetCurrentDirectory(),
 			outputDestination: PythonExecutionUtility.OutputDestination.Console | PythonExecutionUtility.OutputDestination.File,
 			tessbinPath: tessbinPath
 		);

@@ -7,6 +7,10 @@ using PFDB.ConversionUtility;
 using PFDB.Logging;
 using PFDB.PythonExecution;
 using PFDB.SQLite;
+using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.IO;
 
 namespace PFDB.WeaponStructure;
 
@@ -33,6 +37,9 @@ public class PhantomForcesDataModel : IPhantomForcesDataModel
 	/// <exception cref="NotImplementedException"></exception>
 	public static IWeaponCollection GetWeaponCollection(IPythonExecutionFactoryOutput factory)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(factory), factory}
+		});
 		if (factory.IsDefaultConversion) //default conversion, which means we have only ONE conversion per weapon
 		{
 			IWeaponCollection weaponCollection = new WeaponCollection();
@@ -84,6 +91,9 @@ public class PhantomForcesDataModel : IPhantomForcesDataModel
 	/// <exception cref="Exception"></exception>
 	public static IWeaponCollection GetWeaponCollection(PhantomForcesVersion phantomForcesVersion)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(phantomForcesVersion), phantomForcesVersion}
+		});
 		IWeaponCollection weaponCollection = new WeaponCollection();
 		//if (WeaponTable.WeaponIDCache[phantomForcesVersion].Any() == false)WeaponTable.GetWeaponIdent(ifications(phantomForcesVersion);
 
@@ -152,6 +162,9 @@ public class PhantomForcesDataModel : IPhantomForcesDataModel
 	/// <param name="weaponCollection">An <see cref="IWeaponCollection"/> that is populated with weapon data.</param>
 	public PhantomForcesDataModel(IWeaponCollection weaponCollection)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(weaponCollection), weaponCollection}
+		});
 		//ICategory
 
 

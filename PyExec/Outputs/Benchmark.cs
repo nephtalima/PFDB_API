@@ -1,7 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using PFDB.PythonExecutionUtility;
+using PFDB.Logging;
+using System.Collections.Generic;
 using System;
 using System.Diagnostics;
+
 
 namespace PFDB.PythonExecution;
 
@@ -47,6 +50,8 @@ public sealed class Benchmark : IOutput
 	/// </summary>
 	public Benchmark()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		start = DateTime.Now;
 		end = start;
 		stopwatch = new Stopwatch();
@@ -59,6 +64,8 @@ public sealed class Benchmark : IOutput
 	/// </summary>
 	public void StartBenchmark()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		start = DateTime.Now;
 		stopwatch = Stopwatch.StartNew();
 	}
@@ -68,6 +75,8 @@ public sealed class Benchmark : IOutput
 	/// </summary>
 	public void StopBenchmark()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		end = DateTime.Now;
 		stopwatch.Stop();
 		stopwatchDateTime = (end - start);
@@ -80,6 +89,8 @@ public sealed class Benchmark : IOutput
 	/// <returns>A two-tuple, where the first value is calculated by <see cref="StopwatchDateTime"/> and the second by <see cref="StopwatchNormal"/>.</returns>
 	public Tuple<double, double> GetElapsedTimeInSeconds()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		return Tuple.Create(stopwatchDateTime.TotalSeconds, (double)stopwatch.ElapsedMilliseconds / (double)1000);
 	}
 
@@ -90,6 +101,10 @@ public sealed class Benchmark : IOutput
 	/// <returns>A two-tuple, where the first value is calculated by <see cref="StopwatchDateTime"/> and the second by <see cref="StopwatchNormal"/>.</returns>
 	public Tuple<double, double> GetElapsedTimeInSeconds(string outputString)
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(outputString), outputString}
+		});
 		this.outputStr = outputString;
 		return Tuple.Create(stopwatchDateTime.TotalSeconds, (double)stopwatch.ElapsedMilliseconds / (double)1000);
 	}
@@ -97,6 +112,8 @@ public sealed class Benchmark : IOutput
 	/// <inheritdoc/>
 	public new string ToString()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		return OutputString;
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
+using PFDB.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,17 +25,20 @@ public class PythonRankVerifierExecutable : PythonTesseractExecutable, IPythonEx
 	/// <inheritdoc/>
 	public override ProcessStartInfo GetProcessStartInfo()
 	{
+
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
+
 		ProcessStartInfo pyexecute;
 		StringBuilder command = new StringBuilder("Command used: ");
 		if (TessbinPath == null)
 		{
-			pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), $"-cr {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
+			pyexecute = new ProcessStartInfo(PythonVirtualEnvironmentDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), $"-cr {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
 			command.Append(pyexecute.Arguments);
 			command = command.Replace(FileDirectory + Filename, "...." + PyUtilityClass.CommonExecutionPath(Directory.GetCurrentDirectory() ?? "null", FileDirectory + Filename).relativeForeignPath);
 		}
 		else
 		{
-			pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), $"-fr {TessbinPath} {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
+			pyexecute = new ProcessStartInfo(PythonVirtualEnvironmentDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), $"-fr {TessbinPath} {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
 			command.Append(pyexecute.Arguments);
 			command = command.Replace(TessbinPath, "...." + PyUtilityClass.CommonExecutionPath(Directory.GetCurrentDirectory() ?? "null", TessbinPath).relativeForeignPath);
 		}

@@ -1,5 +1,7 @@
 ﻿using PFDB.ConversionUtility;
 using PFDB.WeaponUtility;
+using PFDB.Logging;
+using System.Collections.Generic;
 
 namespace PFDB.WeaponStructure;
 
@@ -32,6 +34,11 @@ public abstract class Weapon : IWeapon
 	/// <param name="category">The category of the weapon.</param>
 	public Weapon(string name, IConversionCollection collection, Categories category)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(name), name},
+			{nameof(collection), collection},
+			{nameof(category), category}
+		});
 		_collection = collection;
 		_name = name; _description = null;
 		Category = category;
@@ -46,6 +53,12 @@ public abstract class Weapon : IWeapon
 	/// <param name="category">The category of the weapon.</param>
 	public Weapon(string name, string? description, IConversionCollection collection, Categories category)
 	{
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(name), name},
+			{nameof(collection), collection},
+			{nameof(category), category},
+			{nameof(description), description}
+		});
 		_collection = collection;
 		_name = name;
 		_description = description;

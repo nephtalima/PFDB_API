@@ -49,6 +49,10 @@ public class ConversionCollection : List<IConversion>, IConversionCollection
 	/// <exception cref="ArgumentException"></exception>
 	public ConversionCollection(IEnumerable<IPythonExecutor> executors)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(executors), executors}
+		});
 		//if all elements have the same weaponID, execute the block below
 		if(executors.DistinctBy(x => x.Input.WeaponID).Any())
 		{
@@ -82,6 +86,10 @@ public class ConversionCollection : List<IConversion>, IConversionCollection
 	/// <param name="defaultConversion">Default conversion to pass through to this class.</param>
 	public ConversionCollection(IDefaultConversion defaultConversion)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(defaultConversion), defaultConversion}
+		});
 		base.Add(defaultConversion);
 		_WID = defaultConversion.WeaponID;
 	}
@@ -89,6 +97,10 @@ public class ConversionCollection : List<IConversion>, IConversionCollection
 	/// <inheritdoc/>
 	public new void Add(IConversion conversion)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(conversion), conversion}
+		});
 		if (HasDefaultConversion && conversion is IDefaultConversion || conversion.WeaponID.WeaponType == WeaponType.Grenade || conversion.WeaponID.WeaponType == WeaponType.Melee)
 		{
 			//we know that the collection already has a default, we cannot add anymore
@@ -105,6 +117,10 @@ public class ConversionCollection : List<IConversion>, IConversionCollection
 	/// <inheritdoc/>
 	public new void AddRange(IEnumerable<IConversion> conversionCollection)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(conversionCollection), conversionCollection}
+		});
 		if (HasDefaultConversion && conversionCollection.ToList().Exists(x => x is IDefaultConversion) || conversionCollection.Where(x => x.WeaponID.WeaponType == WeaponType.Grenade || x.WeaponID.WeaponType == WeaponType.Melee).Any())
 		{
 			//we know that the collection already has a default, we cannot add anymore
@@ -122,6 +138,10 @@ public class ConversionCollection : List<IConversion>, IConversionCollection
 	/// <inheritdoc/>
 	public void AddRange(IConversionCollection conversionCollection)
 	{
+		
+		PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(conversionCollection), conversionCollection}
+		});
 		if (HasDefaultConversion && conversionCollection.HasDefaultConversion || conversionCollection.Conversions.Where(x => x.WeaponID.WeaponType == WeaponType.Grenade || x.WeaponID.WeaponType == WeaponType.Melee).Any())
 		{
 			//we know that the collection already has a default, we cannot add anymore

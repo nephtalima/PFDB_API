@@ -402,9 +402,12 @@ lib64/
 lib64
 pyvenv.cfg
 bin/
+.venv/
 
+# untrack testing relics
 dependencyGraph.html
 ImageParserForAPI/version1021
 ImageParserForAPI/version1151
 MiscellaneousData/
+net8.0/
 net8.0/

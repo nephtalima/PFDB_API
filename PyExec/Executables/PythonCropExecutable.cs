@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.Generic;
 using PFDB.Logging;
 using PFDB.PythonExecutionUtility;
 using PFDB.WeaponUtility;
@@ -17,7 +18,8 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	private WeaponType _weaponType;
 	private string _fileDirectory;
 	private string _filename;
-	private string _programDirectory;
+	private string _pythonVirtualEnvironmentDirectory;
+	private string _scriptDirectory;
 	private bool _isDefaultConversion;
 
 	private static bool _isWindows = Directory.Exists("C:/");
@@ -38,7 +40,10 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	public string Filename { get { return _filename; } }
 
 	/// <inheritdoc/>
-	public string ProgramDirectory { get { return _programDirectory; } }
+	public string PythonVirtualEnvironmentDirectory { get { return _pythonVirtualEnvironmentDirectory; } }
+
+	/// <inheritdoc/>
+	public string ScriptDirectory {get {return _scriptDirectory; } }
 
 	/// <inheritdoc/>
 	public bool IsDefaultConversion { get { return _isDefaultConversion; } }
@@ -47,23 +52,36 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	private bool _untrustedConstruction = true;
 
 	/// <summary>
-	/// Unused constructor, but is necessary for C# to not complain. Use <see cref="Construct(string, string, WeaponIdentification, WeaponType, string, bool)"/> instead.
+	/// Unused constructor, but is necessary for C# to not complain. Use <see cref="Construct(string, string, WeaponIdentification, WeaponType, string, string, bool)"/> instead.
 	/// </summary>
 	internal PythonCropExecutable()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		_WID = new WeaponIdentification(new PhantomForcesVersion(8, 0, 0), 0, 0, 0);
 		_fileDirectory = string.Empty;
 		_filename = string.Empty;
-		_programDirectory = string.Empty;
+		_pythonVirtualEnvironmentDirectory = string.Empty;
+		_scriptDirectory = string.Empty;
 		_weaponType = 0;
 	}
 
 	/// <inheritdoc/>
-	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string programDirectory, bool isDefaultConversion = true)
+	public IPythonExecutable Construct(string filename, string fileDirectory, WeaponIdentification weaponID, WeaponType weaponType, string pythonVirtualEnvironmentDirectory, string scriptDirectory, bool isDefaultConversion = true)
 	{
-		if (!programDirectory.EndsWith('\\'))
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){
+			{nameof(filename), filename},
+			{nameof(fileDirectory), fileDirectory},
+			{nameof(weaponID), weaponID.ID},
+			{nameof(weaponType), weaponType},
+			{nameof(pythonVirtualEnvironmentDirectory), pythonVirtualEnvironmentDirectory},
+			{nameof(scriptDirectory), scriptDirectory},
+			{nameof(isDefaultConversion), isDefaultConversion}
+		});
+		if (!pythonVirtualEnvironmentDirectory.EndsWith('\\'))
 		{
-			programDirectory += '\\';
+			pythonVirtualEnvironmentDirectory += '\\';
 		}
 		if (!fileDirectory.EndsWith('\\'))
 		{
@@ -73,7 +91,7 @@ public sealed class PythonCropExecutable : IPythonExecutable
 		_filename = filename;
 		_WID = weaponID;
 		_weaponType = weaponType;
-		_programDirectory = programDirectory;
+		_pythonVirtualEnvironmentDirectory = pythonVirtualEnvironmentDirectory;
 		_untrustedConstruction = false;
 		_isDefaultConversion = isDefaultConversion;
 		return this;
@@ -82,12 +100,14 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public void CheckInput()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		PythonAggregateException aggregateException = new PythonAggregateException();
 		_internalExecution = false;
-		if ((File.Exists(ProgramDirectory + "impa.exe") == false && _isWindows) || (File.Exists(ProgramDirectory + "impa") == false && _isLinux))
+		if ((File.Exists(PythonVirtualEnvironmentDirectory + "impa.exe") == false && _isWindows) || (File.Exists(PythonVirtualEnvironmentDirectory + "impa") == false && _isLinux))
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it
-			aggregateException.exceptions.Add(new FileNotFoundException($"The application file, specified at {ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty)} does not exist.", ProgramDirectory + "impa.exe"));
+			aggregateException.exceptions.Add(new FileNotFoundException($"The application file, specified at {PythonVirtualEnvironmentDirectory + "impa.py"} does not exist.", PythonVirtualEnvironmentDirectory + "impa.exe"));
 			//throw new FileNotFoundException($"The application file, specified at {ProgramDirectory + "impa.exe"} does not exist.");
 		}
 		if (File.Exists(FileDirectory + Filename) == false)
@@ -112,9 +132,12 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <inheritdoc/>
 	public ProcessStartInfo GetProcessStartInfo()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		ProcessStartInfo pyexecute;
-		pyexecute = new ProcessStartInfo(ProgramDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), string.Format("{0} {1} {2} {3}", "-w", FileDirectory + Filename, Convert.ToString(WeaponType), WeaponID.Version.VersionNumber.ToString()));
+		pyexecute = new ProcessStartInfo(PythonVirtualEnvironmentDirectory + "impa" + (_isWindows ? ".exe" : string.Empty), string.Format("{0} {1} {2} {3}", "-w", FileDirectory + Filename, Convert.ToString(WeaponType), WeaponID.Version.VersionNumber.ToString()));
 		pyexecute.RedirectStandardOutput = true;
+		pyexecute.RedirectStandardError = true;
 		pyexecute.UseShellExecute = false;
 		return pyexecute;
 	}
@@ -125,6 +148,8 @@ public sealed class PythonCropExecutable : IPythonExecutable
 	/// <returns>Output string from Python application.</returns>
 	public IOutput ReturnOutput()
 	{
+		
+        PFDBLogger.LogArguments(new Dictionary<string, object?>(){});
 		if (_internalExecution || _untrustedConstruction)
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it
@@ -138,6 +163,9 @@ public sealed class PythonCropExecutable : IPythonExecutable
 			{
 				if (execute != null)
 				{
+					using (StreamReader reader = execute.StandardError){
+						PFDBLogger.LogError($"\u001b[1;31mError occured while executing the Python script:\u001b[0;0m\n {reader.ReadToEnd()}");
+					}
 					using (StreamReader reader = execute.StandardOutput)
 					{
 						string result = reader.ReadToEnd();
