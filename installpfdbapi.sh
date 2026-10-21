@@ -23,7 +23,7 @@ cd ComponentTester && make all
 
 cd ..
 
-if [ -z "${TESSBINPATH+x}" ]; then
+if [ ! -z "${TESSBINPATH+x}" ]; then
     #Uncomment the next two lines if you have a desired place for your tessbin/ folder to live. This should be a place that isn't temporary.
     #export TESSBINPATH=/home/nephtalima/Programming # For current shell session
     #echo "export TESSBINPATH=/home/nephtalima/Programming # Directory which contains tessbin/ directory" | tee -a $HOME/.bashrc && source $HOME/.bashrc
