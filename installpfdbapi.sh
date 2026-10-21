@@ -12,6 +12,8 @@ source $PWD/bin/activate && echo "Activated."
 echo "Installing Python dependencies..."
 bin/python -m pip install tesseract opencv-python && echo "Installed."
 
+make all
+
 cd ComponentTester && make all
 
 
