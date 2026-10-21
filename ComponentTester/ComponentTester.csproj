@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\p_invokewrapper\P_invokeWrapper.csproj" />
+    <!--<ProjectReference Include="..\p_invokewrapper\P_invokeWrapper.csproj" />-->
     <ProjectReference Include="..\WeaponStructure\WeaponStructure.csproj" />
   </ItemGroup>
 

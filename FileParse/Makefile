@@ -11,11 +11,11 @@ ALL_FILES		:= $(INTERFACE_FILES) $(CONCRETE_FILES) $(CURDIR_FILES)
 
 $(OUTPUT_DIR)/FileParse.dll: $(ALL_FILES)
 	dotnet build --no-dependencies --output $(OUTPUT_DIR) --configuration Debug
-	cp $(MAKE_DIR)/*.txt $(OUTPUT_DIR)/
+#	cp $(MAKE_DIR)/*.txt $(OUTPUT_DIR)/
 
 all:
 	dotnet build --output $(OUTPUT_DIR) --configuration Debug
-	cp $(MAKE_DIR)/*.txt $(OUTPUT_DIR)/
+#	cp $(MAKE_DIR)/*.txt $(OUTPUT_DIR)/
 
 .PHONY: clean
 clean:

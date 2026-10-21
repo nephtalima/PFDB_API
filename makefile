@@ -17,11 +17,11 @@ SQLITEHANDLER	:= $(MAKE_DIR)/SQLiteHandler
 
 .PHONY: individualAll
 individualAll:
-	@cd $(IMAGEPARSER) && make 
+	#@cd $(IMAGEPARSER) && make 
 	@cd $(LOGGER) && make 
 	@cd $(WEAPONUTILITY) && make 
-	@cd $(FILEPARSER) && make 
 	@cd $(STATSTRUCTURE) && make 
+	@cd $(FILEPARSER) && make 
 	@cd $(SQLITEHANDLER) && make 
 	@cd $(PYTHONEXEC) && make 
 	@cd $(CONVERSION) && make 
