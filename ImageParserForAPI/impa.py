@@ -51,6 +51,7 @@ def commandFound(argument, option):
 class ImageParser:
 	def __init__(self, tesspath):
 		self.resize_scale = 5
+		if not(tesspath.endswith("/")): tesspath = tesspath + "/"
 		TESS_PATH = tesspath + "tessbin"
 		testpath = TESS_PATH + "/tessdata/"
 		testpath2 = TESS_PATH + "/tessdata_best-4.1.0"
@@ -423,7 +424,7 @@ def checkAndExecuteOtherCommands(argument, imagePath, weaponType, version, parse
 
 def commandParser():
 	if len(sys.argv) == 1:
-		print("i force fed myself olives for a month, i hated it, but now i love olives")
+		print("I force fed myself olives for a month. I hated it, but now I love olives")
 		return
 	
 	if commandFound(sys.argv[1], "--help") or commandFound(sys.argv[1], "-h") or commandFound(sys.argv[1], "help"):
@@ -473,6 +474,10 @@ VERSION: specifies the version of Phantom Forces
 	
 	if commandFound(sys.argv[1],"c"):
 		if len(sys.argv) == 5: #valid
+			try:
+				tessbinpath = os.environ["TESSBINPATH"]
+			except:
+				print("TESSBINPATH environment variable not found")
 			filepath = sys.argv[2]
 			weaponType = sys.argv[3]
 			version = sys.argv[4]
@@ -506,7 +511,7 @@ VERSION: specifies the version of Phantom Forces
 #pyinstaller command: py -m PyInstaller --onefile --paths=C:\Users\Aethelhelm\AppData\Local\Programs\Python\Python312 imp.py
 	
 commandParser()
-"i force fed myself olives for a month, i hated it, but now i love olives" #quote by dw harder
+"I force fed myself olives for a month. I hated it, but now I love olives" #quote by dw harder
 
 
 #pa = ImageParser()
