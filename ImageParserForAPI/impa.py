@@ -6,7 +6,8 @@ import pytesseract
 import os
 
 
-tempImageDirectory = "pythoncvtes ting/"
+tempImageDirectory = "pythoncvtesting/"
+cv2debug = True
 #todo: add option to have many small images or one big image
 #also, add comments to save my sanity every time i open this file
 
@@ -17,14 +18,12 @@ def thinFontPreprocessing(image):
 	return (erode)
 
 def testAndReadImage(image):
-	# print(os.environ["pythonSignalText"])
 	if type(image) is str:
-		#print(fullscreen_image)
 		print("Does the file " + image + " exist? " + str(os.path.exists(image)))
 		image = cv2.imread(image)
 	return image
 
-def categoryWeaponCrop(imagePath, weaponType, version):
+def categoryWeaponCrop(imagePath: str, weaponType, version):
 	#220,180 -> 475,730
 	if(os.path.isdir("\\cropped\\")):
 		os.mkdir(os.getcwd() + "\\cropped\\")
@@ -33,12 +32,12 @@ def categoryWeaponCrop(imagePath, weaponType, version):
 	crop = image[180:730, 220:475]
 	for i in range(300):
 		if i % 3 == 0:
-			fi = cpath + str(weaponType) + "_" + version + str(i) + ".png"
+			filename = cpath + str(weaponType) + "_" + version + str(i) + ".png"
 			if(os.path.exists(fi)):
 				continue
 			else:
-				print(fi + "saved!")
-				cv2.imwrite(tempImageDirectory + fi, crop)
+				cv2.imwrite(tempImageDirectory + filename, crop)
+				print(filename + "saved!")
 				break
 	#cv2.imwrite("")
 
@@ -48,23 +47,43 @@ def commandFound(argument, option):
 	else:
 		return False
 
+def writedebugimage(version, filenamecounter: int, cropname: str, processname: str, image):
+	filename = tempImageDirectory + "_" + version + "_" + cropname + "_" + str(filenamecounter) + "_" + processname + ".png"
+	cv2.imwrite(filename, image)
+	
+
 class ImageParser:
 	def __init__(self, tesspath):
 		self.resize_scale = 5
+
+		if cv2debug and not os.path.exists(tempImageDirectory):
+			os.mkdir(tempImageDirectory)
+
+		# Add trailing slash
 		if not(tesspath.endswith("/")): tesspath = tesspath + "/"
+
+		# Look for directory ./tessbin/tessdata or ./tessbin/tessdata_best-4.1.0
 		TESS_PATH = tesspath + "tessbin"
 		testpath = TESS_PATH + "/tessdata/"
 		testpath2 = TESS_PATH + "/tessdata_best-4.1.0"
+
+		# Set environment variable for current shell if not set already
 		if(os.path.exists(testpath2)):
 			os.environ["TESSDATA_PREFIX"] = testpath2
 		elif(os.path.exists(testpath)):
 			os.environ["TESSDATA_PREFIX"] = testpath
+
+		# Something for Windows 
 		if not(os.path.exists("/usr/bin")):
 			pytesseract.pytesseract.tesseract_cmd = TESS_PATH + "\\tesseract"
 
 	def parseTextFromImage(self, imagePath, weaponType, version, rank = 0):
+
+		# Set weapon type
 		weaponType = int(weaponType)
 		print("Version: " + version)
+
+
 		crops = self.getListOfCropsFromImage(imagePath,weaponType, version, rank)
 		for crop in crops:
 			print("=" * 5, crop[0], "=" * 5)
@@ -266,7 +285,8 @@ class ImageParser:
 	def getListOfCropsFromImage(self, imagePath, weaponType, version, rank):
 		fullscreen_image = testAndReadImage(imagePath)
 		crops = []
-		#print(version)
+
+
 		if version == "902":
 			crops = self.cropv902(fullscreen_image, weaponType, crops, rank)
 		elif version == "903":
@@ -298,86 +318,78 @@ class ImageParser:
 		if image.size == 0:
 			return "[OCR] Empty Image" #uh oh
 
-		# Convert to black&white image
+		filenamecounter = 0
 
-		bw		= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-		resize	= bw
+		
+		# Convert to black&white image
+		blackandwhite	= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+		if cv2debug:
+			writedebugimage(version, filenamecounter, cropname, "black_and_white", blackandwhite)
+			filenamecounter += 1
+		resize			= blackandwhite
 
 		
 
 		if cropname != "bigcrop" and cropname != "DamageAdvanced" and cropname != "DamageInfo": #if this isn't bigcrop, scale it
-			dim			= (int(bw.shape[0] * (self.resize_scale + 4)), int(bw.shape[1] * (self.resize_scale)))
-			resize		= cv2.resize(bw, dim, interpolation=cv2.INTER_AREA)
-		#elif cropname == "DamageAdvanced" or cropname == "DamageInfo":
-			#dim			= (int(bw.shape[0] * (self.resize_scale+30)), int(bw.shape[1] * self.resize_scale))
-			#resize		= cv2.resize(bw, dim, interpolation=cv2.INTER_AREA)
+			dim			= (int(blackandwhite.shape[0] * (self.resize_scale + 4)), int(blackandwhite.shape[1] * (self.resize_scale)))
+			resize		= cv2.resize(blackandwhite, dim, interpolation=cv2.INTER_AREA)
 			
 		# this block below was copied from StackOverflow many years ago and I have no idea what it does exactly but it works
 
-		#process = unsharp_mask(resize)
-		process1		= cv2.cvtColor( resize, cv2.COLOR_GRAY2BGR)
-
-		lab				= cv2.cvtColor(process1, cv2.COLOR_BGR2LAB)
-		l_channel, a, b = cv2.split(lab)
-		# Applying CLAHE to L-channel
-		# feel free to try different values for the limit and grid size:
-		clahe			= cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-		cl				= clahe.apply(l_channel)
-		# merge the CLAHE enhanced L-channel with the a and b channel
-		limg			= cv2.merge((cl,a,b))
-		# Converting image from LAB Color model to BGR color spcae
-		enhanced_img	= cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-		process2		= cv2.cvtColor(enhanced_img, cv2.COLOR_BGR2GRAY)
-		sharpened_img	= cv2.bilateralFilter(process2,9,75,75)
+		
+		sharpened_img	= cv2.bilateralFilter(resize,9,75,75)
+		if cv2debug:
+			writedebugimage(version, filenamecounter, cropname, "bilateral_filter", sharpened_img)
+			filenamecounter += 1
+		
 		im_bw			= cv2.threshold(sharpened_img, 140, 255, cv2.THRESH_BINARY )[1]
+		if cv2debug:
+			writedebugimage(version, filenamecounter, cropname, "threshold_filter", im_bw)
+			filenamecounter += 1
+		
 		eroded			= thinFontPreprocessing(im_bw)
-
-
-		filename = tempImageDirectory + cropname + version + "_eroded.png"
-		filename2 = tempImageDirectory + cropname + version + "_sharpened.png"
-		filename3 = tempImageDirectory + cropname + version + "_monotone.png"
-		cv2.imwrite(filename, eroded)
-		cv2.imwrite(filename2,sharpened_img)
-		cv2.imwrite(filename3, im_bw)
+		if cv2debug:
+			writedebugimage(version, filenamecounter, cropname, "erode_filter", eroded)
+			filenamecounter += 1
 		
 		damageRangeNumberIndices = []
 		if cropname == "DamageInfo" or cropname == "DamageAdvanced":
 			
-			cv2.imwrite(tempImageDirectory + "pythontemp.png", im_bw)
-			tempimage = cv2.imread("temp.png")#thinFontPreprocessing(enhanced_img)
-			
-			gray			= cv2.cvtColor(tempimage, cv2.COLOR_BGR2GRAY)
-			blur			= cv2.GaussianBlur(gray, (7,7), 0)
-			a = tempImageDirectory + "index_blur_" + cropname + version + ".png"
-			cv2.imwrite(a, blur)
+
+			blur			= cv2.GaussianBlur(im_bw, (7,7), 0)
+			if cv2debug:
+				writedebugimage(version, filenamecounter, cropname, "damage_blur", blur)
+				filenamecounter += 1
 		
 			threshold		= cv2.threshold(blur, 150, 255,  cv2.THRESH_OTSU)[1]
-			a = tempImageDirectory + "index_threshold_" + cropname + version + ".png"
-			cv2.imwrite(a, threshold)
+			if cv2debug:
+				writedebugimage(version, filenamecounter, cropname, "damage_threshold", threshold)
+				filenamecounter += 1
+				
 		
-			kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (6,2))
+			kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (6,2))
 			if int(version) < 1000:
-				kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (8,2)) #big version is around 56, 16
+				kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (8,2)) #big version is around 56, 16
 			else:
-				kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (4,2)) #big version is around 56, 16
-			a = tempImageDirectory + "index_kernal_" + cropname + version + ".png"
-			cv2.imwrite(a, kernal)
-		
+				kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,2)) #big version is around 56, 16
+			if cv2debug:
+				writedebugimage(version, filenamecounter, cropname, "damage_kernel", kernel)
+				filenamecounter += 1
 			
-			dilate = cv2.dilate(threshold, kernal, iterations=1)
-			a = tempImageDirectory + "index_dilate_" + cropname + version + ".png"
-			cv2.imwrite(a, dilate)
+			dilate = cv2.dilate(threshold, kernel, iterations=1)
+			if cv2debug:
+				writedebugimage(version, filenamecounter, cropname, "damage_dilate", threshold)
+				filenamecounter += 1
+			
 
-			counter  = 0
+			counter= 0
 			counts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 			counts = counts[0] if len(counts) == 2 else counts[1]
 			counts = sorted(counts, key=lambda x: cv2.boundingRect(x)[0])
 			for c in counts:
 				x, y, w, h, = cv2.boundingRect(c)
 				if w > 10 or h > 12:
-					#threshold2 = cv2.threshold(sharpened_img, 120, 255, cv2.THRESH_BINARY_INV)[1]
-					#cv2.imwrite("temp2.png", threshold2)
-					#inp = cv2.imread("temp2.png")
 					bufferstarty = y - roi_buffer
 					bufferstartx = x - roi_buffer
 					bufferendy = y + h + roi_buffer
@@ -385,13 +397,12 @@ class ImageParser:
 					if bufferstartx < 0: bufferstartx = 0
 					if bufferstarty < 0: bufferstarty = 0
 
-					damageRangeNumberIndices.append((counter,sharpened_img[bufferstarty:bufferendy , bufferstartx:bufferendx]))
-					damageRangeNumberFile = tempImageDirectory + "index_roi_" + str(counter) + "_" + cropname + version + ".png"
-					cv2.imwrite(damageRangeNumberFile, damageRangeNumberIndices[counter][1])
-					counter = counter + 1
-					cv2.rectangle(tempimage, (x,y), (x+w,y+h), (36, 255, 12), 2)
-			a = tempImageDirectory + "index_bbox_" + cropname + version + ".png"
-			cv2.imwrite(a, tempimage)
+					damageRangeNumberIndices.append((counter,im_bw[bufferstarty:bufferendy , bufferstartx:bufferendx]))
+					if cv2debug:
+						writedebugimage(version, filenamecounter, cropname, "index_roi_" + str(counter), damageRangeNumberIndices[counter][1])
+
+					counter += 1
+					cv2.rectangle(eroded, (x,y), (x+w,y+h), (36, 255, 12), 2)
 			
 
 			##### OCR
@@ -402,7 +413,7 @@ class ImageParser:
 			data = ""
 			for roi in damageRangeNumberIndices:
 				data += ("index " + str(roi[0]) + ": ")
-				data += pytesseract.image_to_string(roi[1], config="--psm 7")
+				data += pytesseract.image_to_string(roi[1], config="--psm 6")
 			return data
 		#elif cropname == "afterglow":
 			#return pytesseract.image_to_string(bw, config="--psm 6")

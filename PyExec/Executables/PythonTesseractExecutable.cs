@@ -187,15 +187,16 @@ public class PythonTesseractExecutable : IPythonExecutable
 		PFDBLogger.LogArguments(new Dictionary<string, object?>() {});
 		ProcessStartInfo pyexecute;
 		StringBuilder command = new StringBuilder("Command used: ");
+		string pfdbPythonBinPath = Environment.GetEnvironmentVariable("PFDB_PYTHON_PATH") ?? "../../../../.venv/bin";
 		if (TessbinPath == null)
 		{
-			pyexecute = new ProcessStartInfo("./python" , $"{_scriptDirectory}{slash}impa.py -c {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
+			pyexecute = new ProcessStartInfo($"{pfdbPythonBinPath}/python" , $"{_scriptDirectory}{slash}impa.py -c {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
 			command.Append(pyexecute.Arguments);
 			command = command.Replace(FileDirectory + Filename, "...." + PyUtilityClass.CommonExecutionPath(Directory.GetCurrentDirectory() ?? "null", FileDirectory + Filename).relativeForeignPath);
 		}
 		else
 		{
-			pyexecute = new ProcessStartInfo("./python" , $"{_scriptDirectory}{slash}impa -f {TessbinPath} {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
+			pyexecute = new ProcessStartInfo($"{pfdbPythonBinPath}/python" , $"{_scriptDirectory}{slash}impa.py -f {TessbinPath} {FileDirectory + Filename} {Convert.ToString((int)WeaponType)} {WeaponID.Version.VersionNumber.ToString()}");
 			command.Append(pyexecute.Arguments);
 			command = command.Replace(TessbinPath, "...." + PyUtilityClass.CommonExecutionPath(Directory.GetCurrentDirectory() ?? "null", TessbinPath).relativeForeignPath);
 		}
@@ -239,11 +240,11 @@ public class PythonTesseractExecutable : IPythonExecutable
 				aggregateException.exceptions.Add(new DirectoryNotFoundException($"The tessbin path specified at {TessbinPath}tessbin{slash} does not exist. Ensure that the directory exists, then try again."));
 			}
 		}
-		if ((File.Exists(PythonVirtualEnvironmentDirectory + "impa.exe") == false && _isWindows) || (File.Exists(PythonVirtualEnvironmentDirectory + "impa") == false && _isLinux))
+		/*if ((File.Exists(PythonVirtualEnvironmentDirectory + "impa.exe") == false && _isWindows) || (File.Exists(PythonVirtualEnvironmentDirectory + "impa") == false && _isLinux))
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it
 			aggregateException.exceptions.Add(new FileNotFoundException($"The application file, specified at {PythonVirtualEnvironmentDirectory + "impa.exe"} does not exist."));
-		}
+		}*/
 		if (!File.Exists(FileDirectory + Filename))
 		{
 			//this shouldn't be logged, the factory ideally should catch and log it
@@ -288,7 +289,8 @@ public class PythonTesseractExecutable : IPythonExecutable
 			{
 
 				using (StreamReader reader = execute.StandardError){
-					PFDBLogger.LogError($"\u001b[1;31mError occured while executing the Python script:\u001b[0;0m\n {reader.ReadToEnd()}");
+					if(reader.ReadToEnd().Trim() != string.Empty)
+						PFDBLogger.LogError($"\u001b[1;31mError occured while executing the Python script:\u001b[0;0m\n {reader.ReadToEnd()}");
 				}
 				using (StreamReader reader = execute.StandardOutput)
 				{

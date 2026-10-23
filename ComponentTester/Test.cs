@@ -43,12 +43,12 @@ public static class Test
                         StringBuilder builder = new StringBuilder();
                         builder.Append("\n");
                         builder.Append("SUB-COMMAND OPTIONS:\n");
-                        builder.Append("pfdb test all (pythonProgramPath) (imageBasePath) (tessbinPath) (acceptableSpaces) (acceptableCorruptedWordSpaces)\n");
+                        builder.Append("pfdb test all (imageBasePath) (pythonProgramPath) (tessbinPath) (scriptDirectory) (acceptableSpaces) (acceptableCorruptedWordSpaces)\n");
                         builder.Append('\n');
-                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is the current working directory.\nIt is recommended to use a Python virtual environment for local builds.\n");
-                        builder.Append("imageBasePath: Path to the root of the images. \n\tThis folder must contain folders named as version<versionNumber>. versionNumber can be found with 'pfdb inventory'. Can be either relative or absolute path. \n\tDefault is the current working directory.\n");
-                        builder.Append("scriptDirectory: Path to the Python script file (usually named impa.py).\n\tThis must be the folder of the script file.\n\tDefault is the currenty workign directory.\n");
-                        builder.Append("tessbinPath: Path to the root of the Tesseract training data (this folder is usually called tessbin). \n\tCan be either relative or absolute path. \n\tDefault is the current working directory.\n");
+                        builder.Append("imageBasePath: Path to the root of the images. \n\tThis folder must contain folders named as version<versionNumber>. versionNumber can be found with 'pfdb inventory'. Can be either relative or absolute path. \n\tDefault is set by environment variable PFDB_IMAGE_PATH, otherwise defaults to the current working directory.\n");
+                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is set by environment variable PFDB_PYTHON_PATH, otherwise defaults to the current working directory.\nIt is recommended to use a Python virtual environment for local builds.\n");
+                        builder.Append("tessbinPath: Path to the root of the Tesseract training data (this folder is usually called tessbin). \n\tCan be either relative or absolute path. \n\tDefault is set by environment variable TESSBINPATH, otherwise defaults tothe current working directory.\n");
+                        builder.Append("scriptDirectory: Path to the Python script file (usually named impa.py).\n\tThis must be the folder of the script file.\n\tDefault is set by environment variable PFDB_IMPA_PATH, otherwise defaults to the currenty working directory.\n");
                         builder.Append($"acceptableSpaces: Maxiumum number of acceptable spaces between words when detecting statistics.\n\tDefault is {AcceptableSpaces} spaces.\n");
                         builder.Append($"acceptableCorruptedWordSpaces: Maxiumum number of acceptable spaces between corrupted words when fixing and detecting statistics.\n\tDefault is {AcceptableCorruptedWordSpaces} spaces.\n");
                         builder.Append($"\nCurrent working directory: {Directory.GetCurrentDirectory()}");
@@ -62,16 +62,16 @@ public static class Test
 
                 //we need 6 arguments:
                 // python program path
-                string? pythonVirtualEnvironmentPath = allargs[0];
+                string? pythonVirtualEnvironmentPath = allargs[1];
                 // image base path
-                string? imageBasePath = allargs[1];
+                string? imageBasePath = allargs[0];
                 // script directory 
-                string? scriptDirectory = allargs[2];
+                string? scriptDirectory = allargs[3];
                 // tessbin path
-                string? tessbinPath = allargs[3];
+                string? tessbinPath = allargs[2];
 
-                int? acceptableSpaces = null; //allargs[3]
-                int? acceptableCorruptedWordSpaces = null; //allargs[4]
+                int? acceptableSpaces = null; //allargs[4]
+                int? acceptableCorruptedWordSpaces = null; //allargs[5]
                 if(allargs[3] != null){
                     try{
                         acceptableSpaces = Convert.ToInt32(allargs[3]);
@@ -97,7 +97,7 @@ public static class Test
                 }
 
 
-                PFDBLogger.LogInformation($"pythonProgramPath: {pythonVirtualEnvironmentPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
+                PFDBLogger.LogInformation($"imageBasePath: {imageBasePath}, pythonProgramPath: {pythonVirtualEnvironmentPath}, tessbinPath: {tessbinPath}, acceptableSpaces number: {acceptableSpaces}, acceptableCorruptedWordSpaces: {acceptableCorruptedWordSpaces}");
 
 
                 Test.TestAll(
@@ -121,12 +121,12 @@ public static class Test
                         StringBuilder builder = new StringBuilder();
                         builder.Append("\n");
                         builder.Append("SUB-COMMAND OPTIONS:\n");
-                        builder.Append("pfdb test py(thon) (pythonProgramPath) (imageBasePath) (tessbinPath)\n");
+                        builder.Append("pfdb test py(thon) (imageBasePath) (pythonProgramPath) (tessbinPath) (scriptDirectory)\n");
                         builder.Append('\n');
-                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is the current working directory.\nIt is recommended to use a Python virtual environment for local builds.\n");
-                        builder.Append("imageBasePath: Path to the root of the images. \n\tThis folder must contain folders named as version<versionNumber>. versionNumber can be found with 'pfdb inventory'. Can be either relative or absolute path. \n\tDefault is the current working directory.\n");
-                        builder.Append("scriptDirectory: Path to the Python script file (usually named impa.py).\n\tThis must be the folder of the script file.\n\tDefault is the currenty workign directory.\n");
-                        builder.Append("tessbinPath: Path to the root of the Tesseract training data (this folder is usually called tessbin). \n\tCan be either relative or absolute path. \n\tDefault is the current working directory.\n");
+                        builder.Append("imageBasePath: Path to the root of the images. \n\tThis folder must contain folders named as version<versionNumber>. versionNumber can be found with 'pfdb inventory'. Can be either relative or absolute path. \n\tDefault is set by environment variable PFDB_IMAGE_PATH, otherwise defaults to the current working directory.\n");
+                        builder.Append("pythonProgramPath: Path to the Python executable (either Windows or Linux executable). \n\tDefault is set by environment variable PFDB_PYTHON_PATH, otherwise defaults to the current working directory.\nIt is strongly recommended to use a Python virtual environment for local builds.\n");
+                        builder.Append("tessbinPath: Path to the root of the Tesseract training data (this folder is usually called tessbin). \n\tCan be either relative or absolute path. \n\tDefault is set by environment variable TESSBINPATH, otherwise defaults to the current working directory.\n");
+                        builder.Append("scriptDirectory: Path to the Python script file (usually named impa.py).\n\tThis must be the folder of the script file.\n\tDefault is set by environment variable PFDB_IMPA_PATH, otherwise defaults to the currenty working directory.\n");
                         builder.Append($"\nCurrent working directory: {Directory.GetCurrentDirectory()}");
                         Console.WriteLine(builder.ToString());
                         break;
@@ -136,13 +136,13 @@ public static class Test
 
                 //we need 4 arguments:
                 // python program path
-                string? pythonVirtualEnvironmentPath = allargs[0];
+                string? pythonVirtualEnvironmentPath = allargs[1];
                 // image base path
-                string? imageBasePath = allargs[1];
+                string? imageBasePath = allargs[0];
                 // script directory 
-                string? scriptDirectory = allargs[2];
+                string? scriptDirectory = allargs[3];
                 // tessbin path
-                string? tessbinPath = allargs[3];
+                string? tessbinPath = allargs[2];
 
                 PFDBLogger.LogInformation($"pythonProgramPath: {pythonVirtualEnvironmentPath}, imageBasePath: {imageBasePath}, tessbinPath: {tessbinPath}");
 
@@ -225,8 +225,21 @@ public static class Test
             {nameof(imageBasePath), imageBasePath},
             {nameof(tessbinPath), tessbinPath}
         });
-        string currentDir = Directory.GetCurrentDirectory();
-        PythonTest.Test(pythonVirtualEnvironmentPath ?? currentDir, imageBasePath ?? currentDir, scriptDirectory ?? currentDir, tessbinPath);
+
+        string currentDir =  Directory.GetCurrentDirectory();
+        string pythonVirtualEnvironmentBackupPath = Environment.GetEnvironmentVariable("PFDB_PYTHON_PATH") ?? currentDir;
+        string imageBaseBackupPath = Environment.GetEnvironmentVariable("PFDB_IMAGE_PATH") ?? currentDir;
+        string scriptBackupDirectory = Environment.GetEnvironmentVariable("PFDB_IMPA_PATH") ?? currentDir;
+        string tessbinBackupPath = Environment.GetEnvironmentVariable("TESSBINPATH") ?? currentDir;
+
+        
+        
+        PythonTest.Test(
+            pythonVirtualEnvironment: pythonVirtualEnvironmentPath ?? pythonVirtualEnvironmentBackupPath, 
+            imageBasePath: imageBasePath ?? imageBaseBackupPath, 
+            scriptDirectory: scriptDirectory ?? scriptBackupDirectory, 
+            tessbinPath: tessbinPath ?? tessbinBackupPath
+            );
     }
 
     
@@ -273,14 +286,26 @@ public static class Test
             {nameof(acceptableSpaces), acceptableSpaces},
             {nameof(acceptableCorruptedWordSpaces), acceptableCorruptedWordSpaces}
         });
+
         string currentDir = Directory.GetCurrentDirectory();
+        string pythonVirtualEnvironmentBackupPath = Environment.GetEnvironmentVariable("PFDB_PYTHON_PATH") ?? currentDir;
+        string imageBaseBackupPath = Environment.GetEnvironmentVariable("PFDB_IMAGE_PATH") ?? currentDir;
+        string scriptBackupDirectory = Environment.GetEnvironmentVariable("PFDB_IMPA_PATH") ?? currentDir;
+        string tessbinBackupPath = Environment.GetEnvironmentVariable("TESSBINPATH") ?? currentDir;
+
+        
 
         WeaponTest.Test();
         ParseTesting.Test(
-            acceptableSpaces ?? AcceptableSpaces,
-            acceptableCorruptedWordSpaces ?? AcceptableCorruptedWordSpaces,
-            stringComparisonMethod ?? StringComparisonMethod);
-        PythonTest.Test(pythonVirtualEnvironmentPath ?? currentDir, imageBasePath ?? currentDir,  scriptDirectory ?? currentDir, tessbinPath);
+            acceptableSpaces: acceptableSpaces ?? AcceptableSpaces,
+            acceptableCorruptedWordSpaces: acceptableCorruptedWordSpaces ?? AcceptableCorruptedWordSpaces,
+            stringComparisonMethod: stringComparisonMethod ?? StringComparisonMethod);
+        PythonTest.Test(
+            pythonVirtualEnvironment: pythonVirtualEnvironmentPath ?? pythonVirtualEnvironmentBackupPath, 
+            imageBasePath: imageBasePath ?? imageBaseBackupPath, 
+            scriptDirectory: scriptDirectory ?? scriptBackupDirectory, 
+            tessbinPath: tessbinPath ?? tessbinBackupPath
+            );
     }
 
 
